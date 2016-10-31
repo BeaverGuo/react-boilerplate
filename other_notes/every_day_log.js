@@ -461,3 +461,5 @@ This setup should leave you with CRLF endings in Windows checkouts, but LF endin
 If you’re a Windows programmer doing a Windows-only project, then you can turn off this functionality, recording the carriage returns in the repository by setting the config value to false:
 
 $ git config --global core.autocrlf false
+
+*/

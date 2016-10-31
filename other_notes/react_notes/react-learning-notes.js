@@ -32,17 +32,23 @@ To build a static version of your app that renders your data model, you'll want 
 DRY原则:
 To build your app correctly, you first need to think of the minimal set of mutable state that your app needs. The key here is DRY: Don't Repeat Yourself. Figure out the absolute minimal representation of the state your application needs and compute everything else you need on-demand. For example, if you're building a TODO list, just keep an array of the TODO items around; don't keep a separate state variable for the count. Instead, when you want to render the TODO count, simply take the length of the TODO items array.
 如果你创建的并非单页面应用, 请不要使用路由. 
+*/
+onResRowClick(record,index,e){//这里用class来判断用户点击了哪个元素,点击了a标签不冒泡触发table row的click
+  if(e.target.classList[0] == `anticon`){
+    event.stopPropagation();
+    return;
+  }
+  if(this.state.rowSelectedIndex == -1){
+    this.add(record);
+    this.setState({
+        rowSelectedIndex:index,
+        record:record
+    });
+  }
+}
 
-
-
-
-
-
-
-
-
-
-
+//在constructor里面的变量貌似不能赋值react组件?下面貌似是不行的
+this.itemsArray = [(<Option value={`pk1/分项1/code1`}>{`分项1`}</Option>),(<Option value={`pk2/分项2/code2`}>{`分项2`}</Option>)];
 
 
 
@@ -1055,4 +1061,40 @@ class Child extends Component {
   render(){
     return <h1>Child</h1>
   }
+}
+
+getChildren(pk,index){
+  let self = this,
+    promiseArr = [],
+    cellDatArr = [];
+    if(index == 1 && Array.isArray(pk)){//怕里写成=号赋值导致index传进来是3,后面变成false了
+        pk.map((val)=>{
+            let p = Api.getChildrenByCode(val);
+            promiseArr.push(p);
+            p.then((dat)=>{
+                cellDatArr.push(dat);
+            });
+        });
+        Promise.all(promiseArr).then((notused)=>{
+            self.props.onSetCellData(cellDatArr);
+        });    
+    }
+    else{
+        let idx = index;
+        Api.getChildrenByCode(pk.split(' ')[0]).then((data)=>{
+            console.log('data',data,idx);
+            switch(index){
+                case 2:
+                self.props.onSetDivData(data);
+                break;
+                case 3:
+                self.props.onSetPartData(data);
+                break;
+                default:
+                break;
+            }
+        }).catch((err)=>{
+            console.log('error2')
+        });
+    }
 }

@@ -12,24 +12,49 @@
   },
   "babel": {
     "presets": [
-      "latest"
-    ]
+      "latest",
+      "react"
+    ],
+    "compact": false
   },
   "eslintConfig": {
     "extends": "airbnb",
     "plugins": [
       "import"
     ],
+    "rules": {
+      "new-cap": [
+        2,
+        {
+          "capIsNewExceptions": [
+            "Map",
+            "List"
+          ]
+        }
+      ]
+    },
     "env": {
       "browser": true
     }
   },
-  
   "author": "BeaverGuo",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "babel-polyfill": "^6.16.0",
+    "d3": "^4.3.0",
+    "immutable": "^3.8.1",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "react-redux": "^4.4.5",
+    "redux": "^3.6.0",
+    "redux-actions": "^0.13.0",
+    "redux-immutable": "^3.0.8"
+  },
   "devDependencies": {
+    "babel-loader": "^6.2.7",
     "babel-preset-latest": "^6.16.0",
+    "babel-preset-react": "^6.16.0",
+    "chai": "^3.5.0",
     "del": "^2.2.2",
     "eslint": "^3.9.0",
     "eslint-config-airbnb": "^12.0.0",
@@ -38,6 +63,8 @@
     "eslint-plugin-react": "^6.4.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
-    "gulp-eslint": "^3.0.1"
+    "gulp-eslint": "^3.0.1",
+    "mocha": "^3.1.2",
+    "webpack-stream": "^3.2.0"
   }
 }

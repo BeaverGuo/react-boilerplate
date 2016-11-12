@@ -632,3 +632,37 @@ represent any potentially complex, hierarchical structure. TheComposite (183)
 pattern captures the essence ofrecursive composition in object-oriented terms.
 
 
+Design a document editor:
+7个问题
+1.   Document structure.The choice of internal representation for the document 
+affects nearlyevery aspect of Lexi's design. All editing, formatting, 
+displaying,and textual analysis will require traversing the representation. 
+Theway we organize this information will impact the design of the rest ofthe 
+application. 
+2.   Formatting.How does Lexi actually arrange text and graphics into lines 
+andcolumns? What objects are responsible for carrying out 
+differentformatting policies? How do these policies interact with 
+thedocument's internal representation? 
+3.   Embellishing the user interface.Lexi's user interface includes scroll bars, 
+borders, and drop shadowsthat embellish the WYSIWYG document interface. 
+Such embellishments arelikely to change as Lexi's user interface evolves. 
+Hence it'simportant to be able to add and remove embellishments easily 
+withoutaffecting the rest of the application. 
+4.   Supporting multiple look-and-feel standards.Lexi should adapt easily to 
+different look-and-feel standardssuch as Motif and Presentation Manager 
+(PM) without major modification. 
+5.   Supporting multiple window systems.Different look-and-feel standards are 
+usually implemented on differentwindow systems. Lexi's design should be 
+as independent of the windowsystem as possible. 
+6.   User operations.Users control Lexi through various user interfaces, 
+includingbuttons and pull-down menus. The functionality behind 
+theseinterfaces is scattered throughout the objects in the application.The 
+challenge here is to provide a uniform mechanism both foraccessing this 
+scattered functionality and for undoing its effects. 
+7.   Spelling checking and hyphenation.How does Lexi support analytical 
+operations such as checking formisspelled words and determining 
+hyphenation points? How can weminimize the number of classes we have to 
+modify to add a newanalytical operation?
+
+we'll choose an internal representation thatmatches the document's 
+physical structure. 根据实际来实现

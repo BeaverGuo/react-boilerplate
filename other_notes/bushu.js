@@ -121,3 +121,10 @@ app文件夹内部所有功能组件性质的集合都大写开头。
 > app\Ajax\Config\config_out.json 外网开发数据及其他服务地址配置文件
 > webpack.prod.config_product.js 最终产品部署配置文件
 > app\Ajax\Config\config_product.json 最终产品部署数据及其他服务地址配置文件
+
+
+git 切换到 os China
+
+git remote add myYFG https://git.oschina.net/yfgbim/YFG-BIM.git
+git pull myYFG master
+git push -u myYFG master

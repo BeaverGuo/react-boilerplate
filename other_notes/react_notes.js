@@ -745,3 +745,10 @@ window.addEventListener("MyEventType", function(evt) {
 //Dispatch an event
 var evt = document.createEvent("CustomEvent");
 evt.initCustomEvent("MyEventType", true, true, "Any Object Here");
+
+
+//nUsed会取到之前pArr里所有的value并组成一个数组
+Promise.all(pArr).then((nUsed)=>{
+  console.log("tmpArr",tmpArr,nUsed);
+  this.setState({dataSource:tmpArr});    
+});

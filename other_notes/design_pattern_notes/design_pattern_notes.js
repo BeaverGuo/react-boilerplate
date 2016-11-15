@@ -666,3 +666,46 @@ modify to add a newanalytical operation?
 
 we'll choose an internal representation thatmatches the document's 
 physical structure. 根据实际来实现
+
+
+In addition to these goals are some constraints. First, we shouldtreat text and 
+graphics uniformly. The application's interface letsthe user embed text within 
+graphics freely and vice versa. We shouldavoid treating graphics as a special 
+case of text or text as a specialcase of graphics; otherwise we'll end up with 
+redundant formatting andmanipulation mechanisms. One set of mechanisms should 
+suffice forboth text and graphics. 
+通用性问题
+Second, our implementation shouldn't have to distinguish between single elements 
+and groups of elements in the internal representation.Lexi should be able to treat 
+simple and complex elements uniformly, thereby allowing arbitrarily complex 
+documents. The tenth element in line five of column two, for instance, could be 
+a single character or an intricate diagram with many subelements. As long as we know 
+this element can draw itself and specify its dimensions, its complexity has no 
+bearing on how and where it should appear on the page. 
+
+简单到复杂，类似react里面的web component
+A common way to represent hierarchically structured information isthrough a 
+technique called recursive composition, whichentails building increasingly 
+complex elements out of simpler ones.
+分层级结构，包括可见的实体和不可见的层级
+We can represent this physical structure by devoting an object to eachimportant 
+element. That includes not just the visible elements likethe characters and 
+graphics but the invisible, structural elements aswell—the lines and the column. 
+The result is the object structureshown in Figure 2.3. 
+粒度
+By using an object for each character and graphical element in thedocument, we 
+promote flexibility at the finest levels of Lexi'sdesign.
+We can treat text and 
+graphics uniformly with respect to howthey are drawn, formatted, and embedded 
+within each other. We canextend Lexi to support new character sets without 
+disturbing otherfunctionality. Lexi's object structure mimics the 
+document'sphysical structure.
+可兼容的接口--> inheritage
+This approach has two important implications. The first is obvious:The objects 
+need corresponding classes. The second implication, whichmay be less obvious, 
+is that these classes must have compatibleinterfaces, because we want to treat 
+the objects uniformly. The way tomake interfaces compatible in a language like 
+C++ is to relate theclasses through inheritance.
+通用属性,抽象类,只能被inheriate不能被例化
+We'll define a Glyph abstract class for allobjects that can appear in a document 
+structure.

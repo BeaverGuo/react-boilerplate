@@ -1098,3 +1098,57 @@ getChildren(pk,index){
         });
     }
 }
+
+//test
+const data = [];
+const batchData = [];
+for(let i=0;i<10;i++){
+    let val = {};
+    val.wp = `code${i}`;
+    val.bidQuant = '';
+    val.bidSum = '';
+    val.techQuant = '';
+    val.techSum = '';
+    val.quantity = '';
+    val.pBidQuant = '';
+    data.push(val);
+}
+
+for(let i=0;i<5;i++){
+    let val = {};
+    val.wp = `code${i}`;
+    val.bidQuant = '';
+    val.bidSum = '';
+    val.techQuant = '';
+    val.techSum = '';
+    val.quantity = '';
+    val.pBidQuant = '';
+    batchData.push(val);
+}
+let iArr = [];
+console.log('data',data);
+let tmpArr = data.map((val,i)=>{
+    //val.wp = `${val.code} ${val.name}`;
+    if(batchData){
+      if(batchData.some((bd)=>{
+        if(bd.wp == val.wp)
+          return true;
+      })){
+        iArr.push(i);
+      }
+    }
+    
+    val.wp = val.wp;
+    val.bidQuant = '';
+    val.bidSum = '';
+    val.techQuant = '';
+    val.techSum = '';
+    val.quantity = '';
+    val.pBidQuant = '';
+    return val;
+});
+console.log("iArr:",iArr);
+let tmpArr2 = tmpArr.filter((val,j)=>((iArr.find((re)=>re == j))===undefined));//这里有个0的bug,必须用undefined来判断
+console.log("tmpArr2",tmpArr2);               
+let tmpArr1 = [...batchData,...tmpArr2];
+console.log("tmpArr",tmpArr1);

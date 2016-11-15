@@ -632,3 +632,131 @@ represent any potentially complex, hierarchical structure. TheComposite (183)
 pattern captures the essence ofrecursive composition in object-oriented terms.
 
 
+As long as weknow
+this element can draw itself and specify its dimensions, itscomplexity has no
+bearing on how and where it should appear on thepage.
+devoting an object to eachimportant element.
+*/
+//abstract class Glyph,
+//appearance
+virtual void Draw(Window*)
+virtual void Bounds(Rect&)
+//hit detection
+virtual bool Intersects(const Point&)
+//structure
+virtual void Insert(Glyph*, int)
+virtual void Remove(Glyph*)
+virtual Glyph* Child(int)
+virtual Glyph* Parent()
+/*Glyphs have three basic responsibilities. They know 
+(1) how to draw themselves,
+(2) what space they occupy, and 
+(3) their children and parent.
+
+接口
+Glyphs like
+Row that can have children should use Childinternally instead of accessing the
+child data structure directly. That wayyou won't have to modify operations like
+Draw that iteratethrough the children when you change the data structure from,
+say, an arrayto a linked list. Similarly, Parent provides a standard interfaceto
+the glyph's parent, if any. Glyphs in Lexi store a reference totheir parent, and
+their Parent operation simply returns thisreference.
+
+the trade-off
+Wewant generally good response from the
+editor without sacrificing how goodthe document looks. This trade-off is subject
+to many factors, not all ofwhich can be ascertained at compile-time. For example,
+the user mighttolerate slightly slower response in exchange for better formatting.
+Thattrade-off might make an entirely different formatting algorithm
+moreappropriate than the current one. Another, more
+implementation-driventrade-off balances formatting speed and storage
+requirements: It may bepossible to decrease formatting time by caching more
+information.
+
+More specifically, we'll define a separate class
+hierarchy for objectsthat encapsulate formatting algorithms. The root of the
+hierarchy willdefine an interface that supports a wide range of
+formattingalgorithms, and each subclass will implement the interface to carryout
+a particular algorithm. Then we can introduce a Glyph subclassthat will structure
+its children automatically using a given algorithmobject.
+
+The Compositor-Composition class split ensures a strong separationbetween code
+that supports the document's physical structure and thecode for different
+formatting algorithms. We can add new Compositorsubclasses without touching the
+glyph classes, and vice versa. Infact, we can change the linebreaking algorithm
+at run-time by adding asingle SetCompositor operation to Composition's basic
+glyphinterface.
+
+要传入context吗?
+Encapsulating an algorithm in an object is the intent of the Strategy (349) pattern.
+The key participants in thepattern are Strategy objects (which encapsulate
+different algorithms)and the context in which they operate.
+
+Encapsulating an algorithm in an object is the intent of the Strategy (349) pattern.
+The key participants in thepattern are Strategy objects (which encapsulate
+different algorithms)and the context in which they operate. Compositors are strategies;they encapsulate different formatting algorithms. A composition is
+thecontext for a compositor strategy.
+
+The key to applying the Strategy pattern is designing interfaces forthe strategy
+and its context that are general enough to support arange of algorithms. You
+shouldn't have to change the strategy orcontext interface to support a new
+algorithm. In our example, thebasic Glyph interface's support for child access,
+insertion, andremoval is general enough to let Compositor subclasses change
+thedocument's physical structure, regardless of the algorithm they use todo it.
+Likewise, the Compositor interface gives compositions whateverthey need to
+initiate formatting.
+解耦
+To make it easy to add
+and remove theseembellishments (especially at run-time), we shouldn't use
+inheritanceto add them to the user interface. We achieve the most flexibilityif
+other user interface objects don't even know the embellishments arethere. That
+will let us add and remove the embellishments withoutchanging other classes.
+
+We could add a border to Composition by subclassing it to yield
+aBorderedComposition class. Or we could add a scrolling interface inthe same way
+to yield a ScrollableComposition. If we want both scrollbars and a border, we
+might produce a BorderedScrollableComposition,and so forth. In the extreme, we
+end up with a class for everypossible combination of embellishments, a solution
+that quicklybecomes unworkable as the variety of embellishments grows.
+
+Our firstchoice, composing the glyph in the border, keeps the
+border-drawingcode entirely in the Border class, leaving other classes alone.
+
+像react
+All this leads us to the concept of transparent enclosure,which combines the
+notions of (1) single-child (orsingle-component) composition and (2)
+compatibleinterfaces. Clients generally can't tell whether they're dealing
+withthe component or its enclosure (i.e., the child's parent),especially if the
+enclosure simply delegates all its operations to itscomponent. But the enclosure
+can also augment the component'sbehavior by doing work of its own before and/or
+after delegating anoperation. The enclosure can also effectively add state to
+thecomponent. We'll see how next.
+
+We can apply the concept of transparent enclosure to all glyphs thatembellish
+other glyphs. To make this concept concrete, we'll define asubclass of Glyph called
+MonoGlyph to serve as an abstractclass for "embellishment glyphs," likeBorder
+(see Figure 2.7).MonoGlyph stores a reference to a component and forwards all
+requests toit. That makes MonoGlyph totally transparent to clients by default.For
+example, MonoGlyph implements the Draw operation like this:
+void MonoGlyph::Draw (Window* w) {
+	_component->Draw(w);
+}
+
+MonoGlyph subclasses reimplement at least one of these forwardingoperations.
+Border::Draw, for instance, first invokes the parentclass operation
+MonoGlyph::Draw on the component to let thecomponent do its part—that is, draw
+everything but the border. ThenBorder::Draw draws the border by calling a
+privateoperation called DrawBorder, the details of which we'llomit:
+void Border::Draw (Window* w) {
+MonoGlyph::Draw(w);
+DrawBorder(w);
+}
+
+Notice how Border::Draw effectively extends the parentclass operation to draw
+the border. This is in contrast to merelyreplacing the parent class operation,
+which would omit the call toMonoGlyph::Draw.
+
+The point is, transparent enclosure
+makes it easy toexperiment with different alternatives, and it keeps clients free
+ofembellishment code.
+

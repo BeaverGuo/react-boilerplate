@@ -1641,26 +1641,121 @@ esoteric data structures. Our access mechanismmust be able to handle all of thes
 possibilities.
 
 
+So our access mechanism must accommodate differing data structures, andwe must
+support different kinds of traversals, such as preorder,postorder, and inorder.
 
 
+Encapsulating Access and Traversal
+
+An important
+role of the glyphabstraction is to hide the data structure in which children
+arestored. That way we can change the data structure a glyph class useswithout
+affecting other classes.
 
 
+Acorollary is that
+the glyph interface shouldn't be biased toward onedata structure or another.
+
+void First(Traversal kind)
+void Next()
+bool IsDone()
+Glyph* GetCurrent()
+void Insert(Glyph*)
+
+Glyph* g;
+for (g->First(PREORDER); !g->IsDone(); g->Next()) {
+Glyph* current = g->GetCurrent();
+// do some analysis
+}
+Notice that we've banished the integer index from the glyph interface.There's
+no longer anything that biases the interface toward one kindof collection or
+another. We've also saved clients from having toimplement common kinds of
+traversals themselves.
+
+But this approach still has problems. For one thing, it can't supportnew traversals
+without either extending the set of enumerated valuesor adding new operations.
+Say we wanted to have a variation on preordertraversal that automatically skips
 
 
+non-textual glyphs. We'd have tochange the Traversal enumeration to include
+something likeTEXTUAL_PREORDER.
+We'd like to avoid changing existing declarations.Putting the traversal mechanism
+entirely in the Glyph class hierarchymakes it hard to modify or extend without
+changing lots of classes.It's also difficult to reuse the mechanism to traverse
+other kinds ofobject structures. And we can't have more than one traversal
+inprogress on a structure.
+Once again, a better solution is to encapsulate the concept thatvaries, in this
+case the access and traversal mechanisms. We canintroduce a class of objects called
+iterators whose solepurpose is to define different sets of these mechanisms. We
+can useinheritance to let us access different data structures uniformly andsupport
+new kinds of traversals as well. And we won't have to changeglyph interfaces or
+disturb existing glyph implementations to do it.
+
+We'll use an abstract class called Iterator todefine a general interface for access
+and traversal.
+
+Each Iterator subclass has areference to the structure
+it traverses. Subclass instances areinitialized with this reference when they
+are created.
+
+Now we can access the children of a glyph structure without knowingits
+representation:
+Glyph* g;
+Iterator<Glyph*>* i = g->CreateIterator();
+for (i->First(); !i->IsDone(); i->Next()) {
+Glyph* child = i->CurrentItem();
+// do something with current child
+}
+
+CreateIterator returns a NullIterator instance by default. ANullIterator is a
+degenerate iterator for glyphs that have nochildren, that is, leaf glyphs.
+NullIterator's IsDone operationalways returns true.
+A glyph subclass that has children will override CreateIterator toreturn an
+instance of a different Iterator subclass. Whichsubclass depends on the structure
+that stores the children. If theRow subclass of Glyph stores its children in a
+list_children, then its CreateIterator operation would looklike this:
+Iterator<Glyph*>* Row::CreateIterator () {
+return new ListIterator<Glyph*>(_children);
+}
+Iterators for preorder and inorder traversals implement theirtraversals in terms
+of glyph-specific iterators. The iterators forthese traversals are supplied the
+root glyph in the structure theytraverse. They call CreateIterator on the glyphs
+in the structure anduse a stack to keep track of the resulting iterators.
 
 
+For example, class PreorderIterator gets the iterator fromthe root glyph,
+initializes it to point to its first element, and thenpushes it onto the stack:
+void PreorderIterator::First () {
+Iterator<Glyph*>* i = _root->CreateIterator();
+if (i) {
+i->First();
+_iterators.RemoveAll();
+_iterators.Push(i);
+}
+}
 
+void PreorderIterator::Next () {
+Iterator<Glyph*>* i = _iterators.Top()->CurrentItem()->CreateIterator();
+i->First();
+_iterators.Push(i);
+while ( _iterators.Size() > 0 && _iterators.Top()->IsDone() ) {
+delete _iterators.Pop();
+_iterators.Top()->Next();
+}
+}
 
+Traversal versus Traversal Actions
+First we have to decide where to put the responsibility for analysis. We could put it in the Iterator classes, thereby making analysis an integral part of traversal. But we get more flexibility and potential for reuse if we distinguish between the traversal and the actions performed during traversal. That's because different analyses often require the same kind of traversal. Hence we can reuse the same set of iterators for different analyses. For example, preorder traversal is common to many analyses, including spelling checking, hyphenation, forward search, and word count.
 
+So analysis and traversal should be separate.
+Where else can we put the responsibility for analysis? We know there are many kinds of analyses we might want to do. Each analysis will do different things at different points in the traversal. Some glyphs are more significant than others depending on the kind of analysis. If we're checking spelling or hyphenating, we want to consider character glyphs and not graphical ones like lines and bitmapped images. If we're making color separations, we'd want to consider visible glyphs and not invisible ones. Inevitably, different analyses will analyze different glyphs.
 
+Therefore a given analysis must be able to distinguish different kinds of glyphs. An obvious approach is to put the analytical capability into the glyph classes themselves. For each analysis we can add one or more abstract operations to the Glyph class and have subclasses implement them in accordance with the role they play in the analysis.
 
+But the trouble with that approach is that we'll have to change every glyph class whenever we add a new kind of analysis. We can ease this problem in some cases: If only a few classes participate in the analysis, or if most classes do the analysis the same way, then we can supply a default implementation for the abstract operation in the Glyph class. The default operation would cover the common case. Thus we'd limit changes to just the Glyph class and those subclasses that deviate from the norm.
 
+Yet even if a default implementation reduces the number of changes, an insidious problem remains: Glyph's interface expands with every new analytical capability. Over time the analytical operations will start to obscure the basic Glyph interface. It becomes hard to see that a glyph's main purpose is to define and structure objects that have appearance and shape—that interface gets lost in the noise.
 
-
-
-
-
-
-
-
+Encapsulating the Analysis
+From all indications, we need to encapsulate the analysis in a separate object, much like we've done many times before. 
 

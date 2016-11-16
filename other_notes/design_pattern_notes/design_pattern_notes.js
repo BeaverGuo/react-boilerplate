@@ -1469,6 +1469,198 @@ the border. This is in contrast to merelyreplacing the parent class operation,
 which would omit the call toMonoGlyph::Draw.
 
 The point is, transparent enclosure
-makes it easy toexperiment with different alternatives, and it keeps clients free
-ofembellishment code.
+makes it easy to experiment with different alternatives, and it keeps clients free
+of embellishment code.
+
+Keeping embellishmentindependent of other
+kinds of composition both simplifies theembellishment classes and reduces their
+number. It also keeps us fromreplicating existing composition functionality.
+
+In the Decorator pattern,
+embellishment refersto anything that adds responsibilities to an object. We can
+thinkfor example of embellishing an abstract syntax tree with semanticactions,
+a finite state automaton with new transitions, or a networkof persistent objects
+with attribute tags. Decorator generalizes theapproach we've used in Lexi to make
+it more widely applicable.
+
+Achieving portability across hardware and software platforms is amajor problem
+in system design.
+
+Lexi needs a way to determine the look-and-feel standard that's beingtargeted
+in order to create the appropriate widgets. Not only must weavoid making explicit
+constructor calls; we must also be able toreplace an entire widget set easily.
+We can achieve both by abstracting the process of object creation. An example
+willillustrate what we mean.
+
+减少look-and-feel依赖
+ScrollBar* sb = new MotifScrollBar;
+-->
+ScrollBar* sb = guiFactory->CreateScrollBar();
+The guiFactory object abstracts the process of creatingnot just Motif scroll bars but scroll
+bars for anylook-and-feel standard. And guiFactory isn't limitedto producing
+scroll bars. It can manufacture a full range of widgetglyphs, including scroll
+bars, buttons, entry fields, menus, andso forth.
+
+Thevariable guiFactory could
+be a global, a static member of awell-known class, or even a local variable if
+the entire user interface iscreated within one class or function. There's even
+a design pattern,Singleton (144), for managing well-known, one-of-a-kindobjects
+like this. The important thing, though, is to initializeguiFactory at a point
+in the program before it's ever usedto create widgets but after it's clear which
+look and feel isdesired.
+
+If the look and feel is known at compile-time, then guiFactorycan be initialized
+with a simple assignment of a new factory instanceat the beginning of the program:
+GUIFactory* guiFactory = new MotifFactory;
+
+
+
+GUIFactory* guiFactory;
+const char* styleName = getenv("LOOK_AND_FEEL");
+// user or environment supplies this at startup
+if (strcmp(styleName, "Motif") == 0) {
+guiFactory = new MotifFactory;
+} else if (strcmp(styleName, "Presentation_Manager") == 0) {
+guiFactory = new PMFactory;
+} else {
+guiFactory = new DefaultGUIFactory;
+}
+
+Window is an abstract class. Concrete subclasses of Window support thedifferent
+kinds of windows that users deal with. For example,application windows, icons,
+and warning dialogs are all windows, butthey have somewhat different behaviors.
+So we can define subclasseslike ApplicationWindow, IconWindow, and DialogWindow
+to capture thesedifferences.
+
+but what else can we do? Thesame thing
+we did for formatting and embellishment, namely, encapsulate the concept that
+varies. What varies in this case is thewindow system implementation. If we
+encapsulate a window system'sfunctionality in an object, then we can implement
+our Window class andsubclasses in terms of that object's interface. Moreover,
+if thatinterface can serve all the window systems we're interested in, thenwe
+won't have to change Window or any of its subclasses to supportdifferent window
+systems. We can configure window objects to thewindow system we want simply by
+passing them the right windowsystem-encapsulating object. We can even configure
+the window atrun-time.
+
+We'll define a separate WindowImp class hierarchy in which tohide different window
+system implementations. WindowImp is an abstractclass for objects that encapsulate
+window system-dependent code. To makeLexi work on a particular window system,
+we configure each windowobject with an instance of a WindowImp subclass for that
+system.
+By hiding the implementations in WindowImp classes, we avoid pollutingthe Window
+classes with window system dependencies, which keeps theWindow class hierarchy
+comparatively small and stable. Meanwhile wecan easily extend the implementation
+hierarchy to support new windowsystems.
+
+void Window::DrawRect ( Coord x0, Coord y0, Coord x1, Coord y1 )
+{ _imp->DeviceRect(x0, y0, x1, y1); }
+where _imp is a member variable of Window that stores theWindowImp with which
+the Window is configured.
+
+void PMWindowImp::DeviceRect ( Coord x0, Coord y0, Coord x1, Coord y1 )
+{
+Coord left = min(x0, x1);
+Coord right = max(x0, x1);
+Coord bottom = min(y0, y1);
+Coord top = max(y0, y1);
+PPOINTL point[4];
+point[0].x = left; point[0].y = top;
+point[1].x = right;point[1].y = top;
+point[2].x = right;point[2].y = bottom;
+point[3].x = left; point[3].y = bottom;
+if ( (GpiBeginPath(_hps, 1L) == false) ||
+(GpiSetCurrentPosition(_hps, &point[3]) == false) ||
+(GpiPolyLine(_hps, 4L, point) == GPI_ERROR) ||
+(GpiEndPath(_hps) == false) )
+{// report error
+} else {
+GpiStrokePath(_hps, 1L, 0L);
+}
+}
+
+PM's implementation of DeviceRect is obviously quitedifferent from X's, but that
+doesn't matter. WindowImp hidesvariations in window system interfaces behind a
+potentially large butstable interface. That lets Window subclass writers focus
+on the windowabstraction and not on window system details. It also lets us
+addsupport for new window systems without disturbing the Window classes.
+
+The intent behind Bridge is to allowseparate class hierarchies to work
+together even as they evolveindependently.
+
+Furthermore, these operations are implemented in many differentclasses. We as
+implementors want to access their functionalitywithout creating a lot of
+dependencies between implementation and userinterface classes. Otherwise we'll
+end up with a tightly coupledimplementation, which will be harder to understand,
+extend, andmaintain.
+
+What's missing is a mechanism that lets us parameterize menu items bythe request
+they should fulfill. That way we avoid a proliferation ofsubclasses and allow
+for greater flexibility at run-time. We couldparameterize MenuItem with a function
+to call, but that's not a completesolution for at least three reasons:
+1. It doesn't address the undo/redo problem.
+2. It's hard to associate state with a function. For example, afunction that
+changes the font needs to know which font.
+3. Functions are hard to extend, and it's hard to reuse parts of them.
+
+These reasons suggest that we should parameterize MenuItems with anobject, not
+a function. Then we can use inheritance to extendand reuse the request's
+implementation. We also have a place to storestate and implement undo/redo
+functionality. Here we have anotherexample of encapsulating the concept that
+varies, in this case arequest. We'll encapsulate each request in a commandobject.
+
+Undo/redo is an important capability in interactive applications. Toundo and redo
+commands, we add an Unexecute operation to Command'sinterface.
+
+Of course, if the subsequent operation is not another redo but an undo,then the
+command to the left of the present line will be undone.
+
+Lexi's commands are an application of the Command (263) pattern, which describes
+how toencapsulate a request. The Command pattern prescribes a uniforminterface
+for issuing requests that lets you configure clients tohandle different requests.
+The interface shields clients from therequest's implementation. A command may
+delegate all, part, or noneof the request's implementation to other objects. This
+is perfect forapplications like Lexi that must provide centralized access
+tofunctionality scattered throughout the application. The pattern alsodiscusses
+undo and redo mechanisms built on the basic Commandinterface.
+
+A diverse set of algorithmscan provide a choice of
+space/time/quality trade-offs.
+
+There are actually two pieces to this puzzle: (1) accessing theinformation to
+be analyzed, which we have scattered over the glyphsin the document structure,
+and (2) doing the analysis. We'll look atthese two pieces separately.
+
+
+Many kinds of analysis require examining the text character bycharacter. The text
+we need to analyze is scattered throughout ahierarchical structure of glyph objects.
+To examine text in such astructure, we need an access mechanism that has knowledge
+about thedata structures in which objects are stored. Some glyphs might storetheir
+children in linked lists, others might use arrays, and stillothers might use more
+esoteric data structures. Our access mechanismmust be able to handle all of these
+possibilities.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -1757,5 +1757,631 @@ But the trouble with that approach is that we'll have to change every glyph clas
 Yet even if a default implementation reduces the number of changes, an insidious problem remains: Glyph's interface expands with every new analytical capability. Over time the analytical operations will start to obscure the basic Glyph interface. It becomes hard to see that a glyph's main purpose is to define and structure objects that have appearance and shape—that interface gets lost in the noise.
 
 Encapsulating the Analysis
-From all indications, we need to encapsulate the analysis in a separate object, much like we've done many times before. 
+From all indications, we need to encapsulate the analysis in a separate object, much like we've done many times before. We could put the machinery for a given analysis into its own class. We could use an instance of this class in conjunction with an appropriate iterator. The iterator would "carry" the instance to each glyph in the structure. The analysis object could then perform a piece of the analysis at each point in the traversal. The analyzer accumulates information of interest (characters in this case) as the traversal proceeds:
+
+
+The fundamental question with this approach is how the analysis object distinguishes different kinds of glyphs without resorting to type tests or downcasts. We don't want a SpellingChecker class to include (pseudo)code like
+
+void SpellingChecker::Check (Glyph* glyph) {
+    Character* c;
+    Row* r;
+    Image* i;
+
+    if (c = dynamic_cast<Character*>(glyph)) {
+        // analyze the character
+
+    } else if (r = dynamic_cast<Row*>(glyph)) {
+        // prepare to analyze r's children
+
+    } else if (i = dynamic_cast<Image*>(glyph)) {
+        // do nothing
+    }
+}
+
+This code is pretty ugly. It relies on fairly esoteric capabilities like type-safe casts. It's hard to extend as well. We'll have to remember to change the body of this function whenever we change the Glyph class hierarchy. In fact, this is the kind of code that object-oriented languages were intended to eliminate.
+We want to avoid such a brute-force approach, but how? Let's consider what happens when we add the following abstract operation to the Glyph class:
+
+void CheckMe(SpellingChecker&)
+
+We define CheckMe in every Glyph subclass as follows:
+
+void GlyphSubclass::CheckMe (SpellingChecker& checker) {
+    checker.CheckGlyphSubclass(this);
+}
+
+where GlyphSubclass would be replaced by the name of the glyph subclass. Note that when CheckMe is called, the specific Glyph subclass is known—after all, we're in one of its operations. In turn, the SpellingChecker class interface includes an operation like CheckGlyphSubclass for every Glyph subclass10:
+
+class SpellingChecker {
+public:
+    SpellingChecker();
+
+    virtual void CheckCharacter(Character*);
+    virtual void CheckRow(Row*);
+    virtual void CheckImage(Image*);
+
+    // ... and so forth
+
+    List<char*>& GetMisspellings();
+
+protected:
+    virtual bool IsMisspelled(const char*);
+
+private:
+    char _currentWord[MAX_WORD_SIZE];
+    List<char*> _misspellings;
+};
+
+SpellingChecker's checking operation for Character glyphs might look something like this:
+
+void SpellingChecker::CheckCharacter (Character* c) {
+    const char ch = c->GetCharCode();
+
+    if (isalpha(ch)) {
+        // append alphabetic character to _currentWord
+
+    } else {
+        // we hit a nonalphabetic character
+
+        if (IsMisspelled(_currentWord)) {
+            // add _currentWord to _misspellings
+            _misspellings.Append(strdup(_currentWord));
+        }
+
+        _currentWord[0] = '\0';
+            // reset _currentWord to check next word
+    }
+}
+
+Notice we've defined a special GetCharCode operation on just the Character class. The spelling checker can deal with subclass-specific operations without resorting to type tests or casts—it lets us treat objects specially.
+CheckCharacter accumulates alphabetic characters into the _currentWord buffer. When it encounters a nonalphabetic character, such as an underscore, it uses the IsMisspelled operation to check the spelling of the word in _currentWord.11 If the word is misspelled, then CheckCharacter adds the word to the list of misspelled words. Then it must clear out the _currentWord buffer to ready it for the next word. When the traversal is over, you can retrieve the list of misspelled words with the GetMisspellings operation.
+Now we can traverse the glyph structure, calling CheckMe on each glyph with the spelling checker as an argument. This effectively identifies each glyph to the SpellingChecker and prompts the checker to do the next increment in the spelling check.
+
+SpellingChecker spellingChecker;
+Composition* c;
+
+// ...
+
+Glyph* g;
+PreorderIterator i(c);
+
+for (i.First(); !i.IsDone(); i.Next()) {
+    g = i.CurrentItem();
+    g->CheckMe(spellingChecker);
+}
+
+This approach works for finding spelling errors, but how does it help us support multiple kinds of analysis? It looks like we have to add an operation like CheckMe(SpellingChecker&) to Glyph and its subclasses whenever we add a new kind of analysis. That's true if we insist on an independent class for every analysis. But there's no reason why we can't give all analysis classes the same interface. Doing so lets us use them polymorphically. That means we can replace analysis-specific operations like CheckMe(SpellingChecker&) with an analysis-independent operation that takes a more general parameter.
+
+
+Visitor Class and Subclasses
+We'll use the term visitor to refer generally to classes of objects that "visit" other objects during a traversal and do something appropriate.12 In this case we can define a Visitor class that defines an abstract interface for visiting glyphs in a structure.
+
+class Visitor {
+public:
+    virtual void VisitCharacter(Character*) { }
+    virtual void VisitRow(Row*) { }
+    virtual void VisitImage(Image*) { }
+
+    // ... and so forth
+};
+Concrete subclasses of Visitor perform different analyses. For example, we could have a SpellingCheckingVisitor subclass for checking spelling, and a HyphenationVisitor subclass for hyphenation. SpellingCheckingVisitor would be implemented exactly as we implemented SpellingChecker above, except the operation names would reflect the more general Visitor interface. For example, CheckCharacter would be called VisitCharacter.
+
+Since CheckMe isn't appropriate for visitors that don't check anything, we'll give it a more general name:
+
+Accept. Its argument must also change to take a Visitor&, reflecting the fact that it can accept any visitor. Now adding a new analysis requires just defining a new subclass of Visitor—we don't have to touch any of the glyph classes. We support all future analyses by adding this one operation to Glyph and its subclasses.
+
+We've already seen how spelling checking works. We use a similar approach in HyphenationVisitor to accumulate text. But once HyphenationVisitor's VisitCharacter operation has assembled an entire word, it works a little differently. Instead of checking the word for misspelling, it applies a hyphenation algorithm to determine the potential hyphenation points in the word, if any. Then at each hyphenation point, it inserts a discretionary glyph into the composition. Discretionary glyphs are instances of Discretionary, a subclass of Glyph.
+
+A discretionary glyph has one of two possible appearances depending on whether or not it is the last character on a line. If it's the last character, then the discretionary looks like a hyphen; if it's not at the end of a line, then the discretionary has no appearance whatsoever. The discretionary checks its parent (a Row object) to see if it is the last child. The discretionary makes this check whenever it's called on to draw itself or calculate its boundaries. The formatting strategy treats discretionaries the same as whitespace, making them candidates for ending a line. The following diagram shows how an embedded discretionary can appear.
+
+Visitor Pattern
+What we've described here is an application of the Visitor pattern. The Visitor class and its subclasses described earlier are the key participants in the pattern. The Visitor pattern captures the technique we've used to allow an open-ended number of analyses of glyph structures without having to change the glyph classes themselves. Another nice feature of visitors is that they can be applied not just to composites like our glyph structures but to any object structure. That includes sets, lists, even directed-acyclic graphs. Furthermore, the classes that a visitor can visit needn't be related to each other through a common parent class. That means visitors can work across class hierarchies.
+
+An important question to ask yourself before applying the Visitor pattern is, Which class hierarchies change most often? The pattern is most suitable when you want to be able to do a variety of different things to objects that have a stable class structure. Adding a new kind of visitor requires no change to that class structure, which is especially important when the class structure is large. But whenever you add a subclass to the structure, you'll also have to update all your visitor interfaces to include a Visit... operation for that subclass. In our example that means adding a new Glyph subclass called Foo will require changing Visitor and all its subclasses to include a VisitFoo operation. But given our design constraints, we're much more likely to add a new kind of analysis to Lexi than a new kind of Glyph. So the Visitor pattern is well-suited to our needs.
+
+We've applied eight different patterns to Lexi's design:
+
+Composite to represent the document's physical structure, 
+Strategy to allow different formatting algorithms, 
+Decorator for embellishing the user interface, 
+Abstract Factory for supporting multiple look-and-feel standards, 
+Bridge to allow multiple windowing platforms, 
+Command for undoable user operations, 
+Iterator for accessing and traversing object structures, and 
+Visitor for allowing an open-ended number of analytical capabilities without complicating the document structure's implementation.
+
+Creational Patterns
+Creational design patterns abstract the instantiation process. 
+A class creational pattern uses inheritance to vary the class that's instantiated, whereas an object creational pattern will delegate instantiation to another object. 
+
+Creational patterns become important as systems evolve to depend more on object composition than class inheritance. As that happens, emphasis shifts away from hard-coding a fixed set of behaviors toward defining a smaller set of fundamental behaviors that can be composed into any number of more complex ones. Thus creating objects with particular behaviors requires more than simply instantiating a class. 
+
+ First, they all encapsulate knowledge about which concrete classes the system uses. Second, they hide how instances of these classes are created and put together. All the system at large knows about the objects is their interfaces as defined by abstract classes. Consequently, the creational patterns give you a lot of flexibility in what gets created, who creates it, how it gets created, and when. They let you configure a system with "product" objects that vary widely in structure and functionality. Configuration can be static (that is, specified at compile-time) or dynamic (at run-time). 
+
+We'll ignore many details of what can be in a maze and whether a maze game has a single or multiple players. Instead, we'll just focus on how mazes get created. We define a maze as a set of rooms. A room knows its neighbors; possible neighbors are another room, a wall, or a door to another room. 
+
+enum Direction {North, South, East, West};
+
+The class MapSite is the common abstract class for all the components of a maze. To simplify the example, MapSite defines only one operation, Enter. Its meaning depends on what you're entering. If you enter a room, then your location changes. If you try to enter a door, then one of two things happen: If the door is open, you go into the next room. If the door is closed, then you hurt your nose.
+
+class MapSite {
+public:
+    virtual void Enter() = 0;
+};
+
+对象作为参数传递
+Enter provides a simple basis for more sophisticated game operations. For example, if you are in a room and say "Go East," the game can simply determine which MapSite is immediately to the east and then call Enter on it. The subclass-specific Enter operation will figure out whether your location changed or your nose got hurt. In a real game, Enter could take the player object that's moving about as an argument.
+
+Room is the concrete subclass of MapSite that defines the key relationships between components in the maze. It maintains references to other MapSite objects and stores a room number. The number will identify rooms in the maze.
+
+class Room : public MapSite {
+public:
+    Room(int roomNo);
+
+    MapSite* GetSide(Direction) const;
+    void SetSide(Direction, MapSite*);
+
+    virtual void Enter();
+
+private:
+    MapSite* _sides[4];
+    int _roomNumber;
+};
+
+
+class Wall : public MapSite {
+public:
+    Wall();
+
+    virtual void Enter();
+};
+
+class Door : public MapSite {
+public:
+    Door(Room* = 0, Room* = 0);
+
+    virtual void Enter();
+    Room* OtherSideFrom(Room*);
+
+private:
+    Room* _room1;
+    Room* _room2;
+    bool _isOpen;
+};
+
+We need to know about more than just the parts of a maze. We'll also define a Maze class to represent a collection of rooms. Maze can also find a particular room given a room number using its RoomNo operation.
+
+class Maze {
+public:
+    Maze();
+
+    void AddRoom(Room*);
+    Room* RoomNo(int) const;
+private:
+    // ...
+};
+RoomNo could do a look-up using a linear search, a hash table, or even a simple array. But we won't worry about such details here. Instead, we'll focus on how to specify the components of a maze object.
+
+Another class we define is MazeGame, which creates the maze. One straightforward way to create a maze is with a series of operations that add components to a maze and then interconnect them. For example, the following member function will create a maze consisting of two rooms with a door between them:
+
+Maze* MazeGame::CreateMaze () {
+    Maze* aMaze = new Maze;
+    Room* r1 = new Room(1);
+    Room* r2 = new Room(2);
+    Door* theDoor = new Door(r1, r2);
+
+    aMaze->AddRoom(r1);
+    aMaze->AddRoom(r2);
+
+    r1->SetSide(North, new Wall);
+    r1->SetSide(East, theDoor);
+    r1->SetSide(South, new Wall);
+    r1->SetSide(West, new Wall);
+
+    r2->SetSide(North, new Wall);
+    r2->SetSide(East, new Wall);
+    r2->SetSide(South, new Wall);
+    r2->SetSide(West, theDoor);
+
+    return aMaze;
+}
+This function is pretty complicated, considering that all it does is create a maze with two rooms. There are obvious ways to make it simpler. For example, the Room constructor could initialize the sides with walls ahead of time. But that just moves the code somewhere else. The real problem with this member function isn't its size but its inflexibility. It hard-codes the maze layout. Changing the layout means changing this member function, either by overriding it—which means reimplementing the whole thing—or by changing parts of it—which is error-prone and doesn't promote reuse.
+
+Suppose you wanted to reuse an existing maze layout for a new game containing (of all things) enchanted mazes. The enchanted maze game has new kinds of components, like DoorNeedingSpell, a door that can be locked and opened subsequently only with a spell; and EnchantedRoom, a room that can have unconventional items in it, like magic keys or spells. How can you change CreateMaze easily so that it creates mazes with these new classes of objects?
+
+In this case, the biggest barrier to change lies in hard-coding the classes that get instantiated. The creational patterns provide different ways to remove explicit references to concrete classes from code that needs to instantiate them:
+
+If CreateMaze calls virtual functions instead of constructor calls to create the rooms, walls, and doors it requires, then you can change the classes that get instantiated by making a subclass of MazeGame and redefining those virtual functions. This approach is an example of the Factory Method pattern. 
+If CreateMaze is passed an object as a parameter to use to create rooms, walls, and doors, then you can change the classes of rooms, walls, and doors by passing a different parameter. This is an example of the Abstract Factory pattern. 
+If CreateMaze is passed an object that can create a new maze in its entirety using operations for adding rooms, doors, and walls to the maze it builds, then you can use inheritance to change parts of the maze or the way the maze is built. This is an example of the Builder pattern. 
+If CreateMaze is parameterized by various prototypical room, door, and wall objects, which it then copies and adds to the maze, then you can change the maze's composition by replacing these prototypical objects with different ones. This is an example of the Prototype pattern.
+The remaining creational pattern, Singleton , can ensure there's only one maze per game and that all game objects have ready access to it—without resorting to global variables or functions. Singleton also makes it easy to extend or replace the maze without touching existing code.
+
+
+Abstract Factory
+Intent
+Provide an interface for creating families of related or dependent objects without specifying their concrete classes.
+We can solve this problem by defining an abstract WidgetFactory class that declares an interface for creating each basic kind of widget. There's also an abstract class for each kind of widget, and concrete subclasses implement widgets for specific look-and-feel standards. WidgetFactory's interface has an operation that returns a new widget object for each abstract widget class. Clients call these operations to obtain widget instances, but clients aren't aware of the concrete classes they're using. Thus clients stay independent of the prevailing look and feel.
+In other words, clients only have to commit to an interface defined by an abstract class, not a particular concrete class.
+
+Use the Abstract Factory pattern when
+
+a system should be independent of how its products are created, composed, and represented. 
+a system should be configured with one of multiple families of products. 
+a family of related product objects is designed to be used together, and you need to enforce this constraint. 
+you want to provide a class library of products, and you want to reveal just their interfaces, not their implementations.
+AbstractFactory (WidgetFactory) 
+declares an interface for operations that create abstract product objects.
+ConcreteFactory (MotifWidgetFactory, PMWidgetFactory) 
+implements the operations to create concrete product objects.
+AbstractProduct (Window, ScrollBar) 
+declares an interface for a type of product object.
+ConcreteProduct (MotifWindow, MotifScrollBar) 
+defines a product object to be created by the corresponding concrete factory. 
+
+implements the AbstractProduct interface.
+Client 
+uses only interfaces declared by AbstractFactory and AbstractProduct classes.
+
+The Abstract Factory pattern has the following benefits and liabilities:
+
+It isolates concrete classes. The Abstract Factory pattern helps you control the classes of objects that an application creates. Because a factory encapsulates the responsibility and the process of creating product objects, it isolates clients from implementation classes. Clients manipulate instances through their abstract interfaces. Product class names are isolated in the implementation of the concrete factory; they do not appear in client code. 
+It makes exchanging product families easy. The class of a concrete factory appears only once in an application—that is, where it's instantiated. This makes it easy to change the concrete factory an application uses. It can use different product configurations simply by changing the concrete factory. Because an abstract factory creates a complete family of products, the whole product family changes at once. In our user interface example, we can switch from Motif widgets to Presentation Manager widgets simply by switching the corresponding factory objects and recreating the interface. 
+It promotes consistency among products. When product objects in a family are designed to work together, it's important that an application use objects from only one family at a time. AbstractFactory makes this easy to enforce. 
+Supporting new kinds of products is difficult. Extending abstract factories to produce new kinds of Products isn't easy. That's because the AbstractFactory interface fixes the set of products that can be created. Supporting new kinds of products requires extending the factory interface, which involves changing the AbstractFactory class and all of its subclasses. We discuss one solution to this problem in the Implementation section.
+
+Implementation
+Here are some useful techniques for implementing the Abstract Factory pattern.
+
+Factories as singletons. An application typically needs only one instance of a ConcreteFactory per product family. So it's usually best implemented as a Singleton . 
+Creating the products. AbstractFactory only declares an interface for creating products. It's up to ConcreteProduct subclasses to actually create them. The most common way to do this is to define a factory method (see Factory Method ) for each product. A concrete factory will specify its products by overriding the factory method for each. While this implementation is simple, it requires a new concrete factory subclass for each product family, even if the product families differ only slightly. 
+
+
+
+A more flexible but less safe design is to add a parameter to operations that create objects. This parameter specifies the kind of object to be created. It could be a class identifier, an integer, a string, or anything else that identifies the kind of product. In fact with this approach, AbstractFactory only needs a single "Make" operation with a parameter indicating the kind of object to create. This is the technique used in the Prototype- and the class-based abstract factories discussed earlier.
+
+This variation is easier to use in a dynamically typed language like Smalltalk than in a statically typed language like C++. You can use it in C++ only when all objects have the same abstract base class or when the product objects can be safely coerced to the correct type by the client that requested them. The implementation section of Factory Method shows how to implement such parameterized operations in C++.
+
+But even when no coercion is needed, an inherent problem remains: All products are returned to the client with the same abstract interface as given by the return type. The client will not be able to differentiate or make safe assumptions about the class of a product. If clients need to perform subclass-specific operations, they won't be accessible through the abstract interface. Although the client could perform a downcast (e.g., with dynamic_cast in C++), that's not always feasible or safe, because the downcast can fail. This is the classic trade-off for a highly flexible and extensible interface.
+
+
+
+
+Class MazeFactory can create components of mazes. It builds rooms, walls, and doors between rooms. It might be used by a program that reads plans for mazes from a file and builds the corresponding maze. Or it might be used by a program that builds mazes randomly. Programs that build mazes take a MazeFactory as an argument so that the programmer can specify the classes of rooms, walls, and doors to construct.
+
+class MazeFactory {
+public:
+    MazeFactory();
+
+    virtual Maze* MakeMaze() const
+        { return new Maze; }
+    virtual Wall* MakeWall() const
+        { return new Wall; }
+    virtual Room* MakeRoom(int n) const
+        { return new Room(n); }
+    virtual Door* MakeDoor(Room* r1, Room* r2) const
+        { return new Door(r1, r2); }
+};
+
+Recall that the member function CreateMaze () builds a small maze consisting of two rooms with a door between them. CreateMaze hard-codes the class names, making it difficult to create mazes with different components.
+
+Here's a version of CreateMaze that remedies that shortcoming by taking a MazeFactory as a parameter:
+
+Maze* MazeGame::CreateMaze (MazeFactory& factory) {
+    Maze* aMaze = factory.MakeMaze();
+    Room* r1 = factory.MakeRoom(1);
+    Room* r2 = factory.MakeRoom(2);
+    Door* aDoor = factory.MakeDoor(r1, r2);
+
+    aMaze->AddRoom(r1);
+    aMaze->AddRoom(r2);
+
+    r1->SetSide(North, factory.MakeWall());
+    r1->SetSide(East, aDoor);
+    r1->SetSide(South, factory.MakeWall());
+    r1->SetSide(West, factory.MakeWall());
+
+    r2->SetSide(North, factory.MakeWall());
+    r2->SetSide(East, factory.MakeWall());
+    r2->SetSide(South, factory.MakeWall());
+    r2->SetSide(West, aDoor);
+
+    return aMaze;
+}
+
+We can create EnchantedMazeFactory, a factory for enchanted mazes, by subclassing MazeFactory. EnchantedMazeFactory will override different member functions and return different subclasses of Room, Wall, etc.
+
+class EnchantedMazeFactory : public MazeFactory {
+public:
+    EnchantedMazeFactory();
+
+    virtual Room* MakeRoom(int n)  const
+        { return new EnchantedRoom(n, CastSpell()); }
+
+    virtual Door* MakeDoor(Room* r1, Room* r2)  const
+        { return new DoorNeedingSpell(r1, r2); }
+
+protected:
+    Spell* CastSpell() const;
+};
+
+Now suppose we want to make a maze game in which a room can have a bomb set in it. If the bomb goes off, it will damage the walls (at least). We can make a subclass of Room keep track of whether the room has a bomb in it and whether the bomb has gone off. We'll also need a subclass of Wall to keep track of the damage done to the wall. We'll call these classes RoomWithABomb and BombedWall.
+
+The last class we'll define is BombedMazeFactory, a subclass of MazeFactory that ensures walls are of class BombedWall and rooms are of class RoomWithABomb. BombedMazeFactory only needs to override two functions:
+
+Wall* BombedMazeFactory::MakeWall () const {
+    return new BombedWall;
+}
+
+Room* BombedMazeFactory::MakeRoom(int n) const {
+    return new RoomWithABomb(n);
+}
+
+To build a simple maze that can contain bombs, we simply call CreateMaze with a BombedMazeFactory.
+
+MazeGame game;
+BombedMazeFactory factory;
+
+game.CreateMaze(factory);
+
+CreateMaze can take an instance of EnchantedMazeFactory just as well to build enchanted mazes.
+
+
+The Builder pattern captures all these relationships. Each converter class is called a builder in the pattern, and the reader is called the director. Applied to this example, the Builder pattern separates the algorithm for interpreting a textual format (that is, the parser for RTF documents) from how a converted format gets created and represented. This lets us reuse the RTFReader's parsing algorithm to create different text representations from RTF documents—just configure the RTFReader with different subclasses of TextConverter.
+
+Use the Builder pattern when
+
+the algorithm for creating a complex object should be independent of the parts that make up the object and how they're assembled.
+
+the construction process must allow different representations for the object that's constructed.
+
+Collaborations
+The client creates the Director object and configures it with the desired Builder object. 
+Director notifies the builder whenever a part of the product should be built. 
+Builder handles requests from the director and adds parts to the product. 
+The client retrieves the product from the builder.
+Here are key consequences of the Builder pattern:
+
+It lets you vary a product's internal representation. The Builder object provides the director with an abstract interface for constructing the product. The interface lets the builder hide the representation and internal structure of the product. It also hides how the product gets assembled. Because the product is constructed through an abstract interface, all you have to do to change the product's internal representation is define a new kind of builder. 
+It isolates code for construction and representation. The Builder pattern improves modularity by encapsulating the way a complex object is constructed and represented. Clients needn't know anything about the classes that define the product's internal structure; such classes don't appear in Builder's interface. 
+Each ConcreteBuilder contains all the code to create and assemble a particular kind of product. The code is written once; then different Directors can reuse it to build Product variants from the same set of parts. In the earlier RTF example, we could define a reader for a format other than RTF, say, an SGMLReader, and use the same TextConverters to generate ASCIIText, TeXText, and TextWidget renditions of SGML documents. 
+
+It gives you finer control over the construction process. Unlike creational patterns that construct products in one shot, the Builder pattern constructs the product step by step under the director's control. Only when the product is finished does the director retrieve it from the builder. Hence the Builder interface reflects the process of constructing the product more than other creational patterns. This gives you finer control over the construction process and consequently the internal structure of the resulting product.
+Here are other implementation issues to consider:
+
+Assembly and construction interface. Builders construct their products in step-by-step fashion. Therefore the Builder class interface must be general enough to allow the construction of products for all kinds of concrete builders. 
+A key design issue concerns the model for the construction and assembly process. A model where the results of construction requests are simply appended to the product is usually sufficient. In the RTF example, the builder converts and appends the next token to the text it has converted so far.
+
+But sometimes you might need access to parts of the product constructed earlier. In the Maze example we present in the Sample Code, the MazeBuilder interface lets you add a door between existing rooms. Tree structures such as parse trees that are built bottom-up are another example. In that case, the builder would return child nodes to the director, which then would pass them back to the builder to build the parent nodes. 
+
+Why no abstract class for products? In the common case, the products produced by the concrete builders differ so greatly in their representation that there is little to gain from giving different products a common parent class. In the RTF example, the ASCIIText and the TextWidget objects are unlikely to have a common interface, nor do they need one. Because the client usually configures the director with the proper concrete builder, the client is in a position to know which concrete subclass of Builder is in use and can handle its products accordingly. 
+Empty methods as default in Builder. In C++, the build methods are intentionally not declared pure virtual member functions. They're defined as empty methods instead, letting clients override only the operations they're interested in.
+
+We'll define a variant of the CreateMaze member function that takes a builder of class MazeBuilder as an argument.
+
+The MazeBuilder class defines the following interface for building mazes:
+外壳,provide general interface and hide information from outside, and can be reused.
+Note that MazeBuilder does not create mazes itself; its main purpose is just to define an interface for creating mazes.
+
+class MazeBuilder {
+public:
+    virtual void BuildMaze() { }
+    virtual void BuildRoom(int room) { }
+    virtual void BuildDoor(int roomFrom, int roomTo) { }
+
+    virtual Maze* GetMaze() { return 0; }
+protected:
+    MazeBuilder();
+};
+
+
+The subclass StandardMazeBuilder is an implementation that builds simple mazes. It keeps track of the maze it's building in the variable _currentMaze.
+this is the specifics class public from MazeBuilder:
+class StandardMazeBuilder : public MazeBuilder {
+public:
+    StandardMazeBuilder();
+
+    virtual void BuildMaze();
+    virtual void BuildRoom(int);
+    virtual void BuildDoor(int, int);
+
+    virtual Maze* GetMaze();
+private:
+    Direction CommonWall(Room*, Room*);
+    Maze* _currentMaze;
+};
+
+
+This interface can create three things: 
+(1) the maze, 
+(2) rooms with a particular room number, and 
+(3) doors between numbered rooms. The GetMaze operation returns the maze to the client. Subclasses of MazeBuilder will override this operation to return the maze that they build.
+
+All the maze-building operations of MazeBuilder do nothing by default. They're not declared pure virtual to let derived classes override only those methods in which they're interested.
+
+Given the MazeBuilder interface, we can change the CreateMaze member function to take this builder as a parameter.
+pass as a parameter
+Maze* MazeGame::CreateMaze (MazeBuilder& builder) {
+    builder.BuildMaze();
+
+    builder.BuildRoom(1);
+    builder.BuildRoom(2);
+    builder.BuildDoor(1, 2);
+
+    return builder.GetMaze();
+}
+
+CommonWall is a utility operation that determines the direction of the common wall between two rooms.
+
+The StandardMazeBuilder constructor simply initializes _currentMaze.
+
+StandardMazeBuilder::StandardMazeBuilder () {
+    _currentMaze = 0;
+}
+
+BuildMaze instantiates a Maze that other operations will assemble and eventually return to the client (with GetMaze).
+
+void StandardMazeBuilder::BuildMaze () {
+    _currentMaze = new Maze;
+}
+
+Maze* StandardMazeBuilder::GetMaze () {
+    return _currentMaze;
+}
+
+The BuildRoom operation creates a room and builds the walls around it:
+
+void StandardMazeBuilder::BuildRoom (int n) {
+    if (!_currentMaze->RoomNo(n)) {
+        Room* room = new Room(n);
+        _currentMaze->AddRoom(room);
+
+        room->SetSide(North, new Wall);
+        room->SetSide(South, new Wall);
+        room->SetSide(East, new Wall);
+        room->SetSide(West, new Wall);
+    }
+}
+To build a door between two rooms, StandardMazeBuilder looks up both rooms in the maze and finds their adjoining wall:
+
+void StandardMazeBuilder::BuildDoor (int n1, int n2) {
+    Room* r1 = _currentMaze->RoomNo(n1);
+    Room* r2 = _currentMaze->RoomNo(n2);
+    Door* d = new Door(r1, r2);
+
+    r1->SetSide(CommonWall(r1,r2), d);
+    r2->SetSide(CommonWall(r2,r1), d);
+
+
+Clients can now use CreateMaze in conjunction with StandardMazeBuilder to create a maze:
+
+Maze* maze;
+MazeGame game;
+StandardMazeBuilder builder;
+
+game.CreateMaze(builder);
+maze = builder.GetMaze();
+
+
+pros:
+We could have put all the StandardMazeBuilder operations in Maze and let each Maze build itself. But making Maze smaller makes it easier to understand and modify, and StandardMazeBuilder is easy to separate from Maze. Most importantly, separating the two lets you have a variety of MazeBuilders, each using different classes for rooms, walls, and doors.
+
+A more exotic MazeBuilder is CountingMazeBuilder. This builder doesn't create a maze at all; it just counts the different kinds of components that would have been created.
+
+class CountingMazeBuilder : public MazeBuilder {
+public:
+    CountingMazeBuilder();
+
+    virtual void BuildMaze();
+    virtual void BuildRoom(int);
+    virtual void BuildDoor(int, int);
+    virtual void AddWall(int, Direction);
+
+    void GetCounts(int&, int&) const;
+private:
+    int _doors;
+    int _rooms;
+};
+
+The constructor initializes the counters, and the overridden MazeBuilder operations increment them accordingly.
+
+CountingMazeBuilder::CountingMazeBuilder () {
+    _rooms = _doors = 0;
+}
+
+void CountingMazeBuilder::BuildRoom (int) {
+    _rooms++;
+}
+
+void CountingMazeBuilder::BuildDoor (int, int) {
+    _doors++;
+}
+
+void CountingMazeBuilder::GetCounts (
+    int& rooms, int& doors
+) const {
+    rooms = _rooms;
+    doors = _doors;
+}
+
+
+
+int rooms, doors;
+MazeGame game;
+CountingMazeBuilder builder;
+
+game.CreateMaze(builder);
+builder.GetCounts(rooms, doors);
+
+cout << "The maze has "
+     << rooms << " rooms and "
+     << doors << " doors" << endl;
+
+
+
+Builder is a common pattern in Smalltalk-80 [Par90]:
+
+The Parser class in the compiler subsystem is a Director that takes a ProgramNodeBuilder object as an argument. A Parser object notifies its ProgramNodeBuilder object each time it recognizes a syntactic construct. When the parser is done, it asks the builder for the parse tree it built and returns it to the client. 
+ClassBuilder is a builder that Classes use to create subclasses for themselves. In this case a Class is both the Director and the Product. 
+ByteCodeStream is a builder that creates a compiled method as a byte array. ByteCodeStream is a nonstandard use of the Builder pattern, because the complex object it builds is encoded as a byte array, not as a normal Smalltalk object. But the interface to ByteCodeStream is typical of a builder, and it would be easy to replace ByteCodeStream with a different class that represented programs as a composite object.
+
+Abstract Factory is similar to Builder in that it too may construct complex objects. The primary difference is that the Builder pattern focuses on constructing a complex object step by step. Abstract Factory's emphasis is on families of product objects (either simple or complex). Builder returns the product as a final step, but as far as the Abstract Factory pattern is concerned, the product gets returned immediately.
+
+A Composite is what the builder often builds.
+
+Factory Method
+Define an interface for creating an object, but let subclasses decide which class to instantiate. Factory Method lets a class defer instantiation to subclasses.
+
+Frameworks use abstract classes to define and maintain relationships between objects. A framework is often responsible for creating these objects as well.
+
+
+Consider a framework for applications that can present multiple documents to the user. Two key abstractions in this framework are the classes Application and Document. Both classes are abstract, and clients have to subclass them to realize their application-specific implementations. To create a drawing application, for example, we define the classes DrawingApplication and DrawingDocument. The Application class is responsible for managing Documents and will create them as required—when the user selects Open or New from a menu, for example.
+
+Because the particular Document subclass to instantiate is application-specific, the Application class can't predict the subclass of Document to instantiate—the Application class only knows when a new document should be created, not what kind of Document to create. This creates a dilemma: The framework must instantiate classes, but it only knows about abstract classes, which it cannot instantiate.
+
+The Factory Method pattern offers a solution. It encapsulates the knowledge of which Document subclass to create and moves this knowledge out of the framework.
+Use the Factory Method pattern when
+
+a class can't anticipate the class of objects it must create. 
+a class wants its subclasses to specify the objects it creates. 
+classes delegate responsibility to one of several helper subclasses, and you want to localize the knowledge of which helper subclass is the delegate.
+
+
+Product (Document) 
+defines the interface of objects the factory method creates.
+ConcreteProduct (MyDocument) 
+implements the Product interface.
+Creator (Application) 
+declares the factory method, which returns an object of type Product. Creator may also define a default implementation of the factory method that returns a default ConcreteProduct object. 
+
+may call the factory method to create a Product object.
+ConcreteCreator (MyApplication) 
+overrides the factory method to return an instance of a ConcreteProduct.
+
+Factory methods eliminate the need to bind application-specific classes into your code. The code only deals with the Product interface; therefore it can work with any user-defined ConcreteProduct classes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -15,7 +15,7 @@
 
   function createClass(ctor, superClass) {//利用Object.create实现object link
     if (superClass) {
-      ctor.prototype = Object.create(superClass.prototype);
+      ctor.prototype = Object.create(superClass.prototype);//amazing Object.create to link prototype to superClass
     }
     ctor.prototype.constructor = ctor;
   }
@@ -231,7 +231,7 @@
   }
 
   function getIteratorFn(iterable) {
-    var iteratorFn = iterable && (//Symbol(Symbol.iterator)
+    var iteratorFn = iterable && (//REAL_ITERATOR_SYMBOL is Symbol(Symbol.iterator)
       (REAL_ITERATOR_SYMBOL && iterable[REAL_ITERATOR_SYMBOL]) ||
       iterable[FAUX_ITERATOR_SYMBOL]
     );
@@ -284,7 +284,7 @@
 
 
 
-  createClass(KeyedSeq, Seq);
+  createClass(KeyedSeq, Seq);//KeyedSeq is a constructor and Seq is superClass for linking __proto__
     function KeyedSeq(value) {
       return value === null || value === undefined ?
         emptySequence().toKeyedSeq() :
@@ -392,9 +392,9 @@
 
 
 
-  createClass(ObjectSeq, KeyedSeq);
+  createClass(ObjectSeq, KeyedSeq);//link relationship: ObjectSeq-->KeyedSeq-->Seq
     function ObjectSeq(object) {//object properties
-      var keys = Object.keys(object);
+      var keys = Object.keys(object);//three props of Object
       this._object = object;
       this._keys = keys;
       this.size = keys.length;
@@ -552,7 +552,7 @@
       hasIterator(value) ? new IterableSeq(value).fromEntrySeq() :
       typeof value === 'object' ? new ObjectSeq(value) :
       undefined;
-    if (!seq) {
+    if (!seq) {//learn to throw new TypeError here.
       throw new TypeError(
         'Expected Array or iterable object of [k, v] entries, '+
         'or keyed object: ' + value
@@ -621,18 +621,20 @@
     return seq.__iteratorUncached(type, reverse);
   }
 
-  function fromJS(json, converter) {
+  function fromJS(json, converter) {//json is {}, converter is undefined
     return converter ?
       fromJSWith(converter, json, '', {'': json}) :
       fromJSDefault(json);
+  }
   }
 
   function fromJSWith(converter, json, key, parentJSON) {
     if (Array.isArray(json)) {
       return converter.call(parentJSON, key, IndexedSeq(json).map(function(v, k)  {return fromJSWith(converter, v, k, json)}));
     }
-    if (isPlainObj(json)) {
+    if (isPlainObj(json)) {//{} is plain object for its constructor is Object
       return converter.call(parentJSON, key, KeyedSeq(json).map(function(v, k)  {return fromJSWith(converter, v, k, json)}));
+    }
     }
     return json;
   }
@@ -641,13 +643,13 @@
     if (Array.isArray(json)) {
       return IndexedSeq(json).map(fromJSDefault).toList();
     }
-    if (isPlainObj(json)) {//plain object definition
-      return KeyedSeq(json).map(fromJSDefault).toMap();
+    if (isPlainObj(json)) {
+      return KeyedSeq(json).map(fromJSDefault).toMap();//KeyedIterable toMap()
     }
     return json;
   }
 
-  function isPlainObj(value) {
+  function isPlainObj(value) {//plain object helper function,but when is it value.constructor === undefined ?
     return value && (value.constructor === Object || value.constructor === undefined);
   }
 
@@ -1205,7 +1207,7 @@
   var stringHashCache = {};
 
   function assertNotInfinite(size) {
-    invariant(
+    invariant(//Infinity is number?
       size !== Infinity,
       'Cannot perform this action with an infinite size.'
     );
@@ -1802,10 +1804,10 @@
   }
 
   function makeMap(size, root, ownerID, hash) {
-    var map = Object.create(MapPrototype);
+    var map = Object.create(MapPrototype);//link to Map.prototype
     map.size = size;
     map._root = root;
-    map.__ownerID = ownerID;
+    map.__ownerID = ownerID;//what is ownerID for?
     map.__hash = hash;
     map.__altered = false;
     return map;
@@ -1820,7 +1822,7 @@
     var newRoot;
     var newSize;
     if (!map._root) {
-      if (v === NOT_SET) {
+      if (v === NOT_SET) {//{}
         return map;
       }
       newSize = 1;
@@ -3003,7 +3005,7 @@
   }
 
 
-  function mapFactory(iterable, mapper, context) {
+  function mapFactory(iterable, mapper, context) {//iterable is ObjectSeq
     var mappedSequence = makeSequence(iterable);
     mappedSequence.size = iterable.size;
     mappedSequence.has = function(key ) {return iterable.has(key)};
@@ -3590,7 +3592,7 @@
   }
 
   function makeSequence(iterable) {
-    return Object.create(//Object.create receive prototype
+    return Object.create(//Object.create receive prototype, object type
       (
         isKeyed(iterable) ? KeyedSeq :
         isIndexed(iterable) ? IndexedSeq :
@@ -4240,10 +4242,10 @@
   /**
    * Contributes additional methods to a constructor
    */
-  function mixin(ctor, methods) {
+  function mixin(ctor, methods) {//mixin methods to ctor.prototype
     var keyCopier = function(key ) { ctor.prototype[key] = methods[key]; };
     Object.keys(methods).forEach(keyCopier);
-    Object.getOwnPropertySymbols &&
+    Object.getOwnPropertySymbols &&//copy Symbol
       Object.getOwnPropertySymbols(methods).forEach(keyCopier);
     return ctor;
   }
@@ -4671,7 +4673,7 @@
   // var IS_ORDERED_SENTINEL = '@@__IMMUTABLE_ORDERED__@@';
 
   var IterablePrototype = Iterable.prototype;
-  IterablePrototype[IS_ITERABLE_SENTINEL] = true;
+  IterablePrototype[IS_ITERABLE_SENTINEL] = true;//flag for iterable
   IterablePrototype[ITERATOR_SYMBOL] = IterablePrototype.values;
   IterablePrototype.__toJS = IterablePrototype.toArray;
   IterablePrototype.__toStringMapper = quoteString;

@@ -227,3 +227,85 @@ console.log("string.".match(pattern));//["string"]
 *string(?!s)/匹配"string","g"后不能跟"s"
 */
 在表示重复次数时，代表重复0次或1次
+
+I want to say that I don’t like that people try to classify JavaScript as object-oriented. It is event-oriented. It is in its own class. It is unique. Maybe Go is also kind of event-oriented. It’s more message-oriented. But JavaScript is not object-oriented. If you try to use object-oriented patterns in JavaScript, you’re going to screw it up.
+
+Okay, that’s something I think is hard in JavaScript. When people write code that can’t be serialized and deserialized. Because so much is network-oriented in JavaScript because you’re looking at the browser and the server. And the page could refresh and you might have to put something in local storage. It’s such an unpredictable environment that if you ever end up with an object that can’t easily be serialized and deserialized meaning you can put it out to a string and then read it back and then get the exact same object with the exact same state, then you can get really messy stuff really fast.
+
+I know. And I have to disagree here, too. Because ultimately you have objects in JavaScript. And they’re basically like JSON structures, right? But you can assign different attributes to have different functions. But if you’re using prototypes then you can effectively initialize with the data and use the prototypes to build the behavior back in.
+
+Well, it’s not a performance… in this particular case it’s not a performance reason you do it. It’s binding. And the DOM is definitely slow. But I’m not… go watch Dave Smith’s talk about Angular and React. Angular 2 and React are pretty comparable on performance. But that’s, it really has nothing to do with the DOM, which is funny. It’s all about data binding that’s the reason that it’s slow.
+
+Prototype lookups are dynamic.
+New / updated properties are assigned to the object, not to the prototype.
+eg:
+var person = {
+  kind: 'person'
+}
+
+var zack = {}
+zack.__proto__ = person
+
+zack.kind = 'zack'
+
+console.log(zack.kind); //=> 'zack'
+// zack now has a 'kind' property
+
+console.log(person.kind); //=> 'person'
+// person has not being modified
+
+add props in Object.create
+var zack = Object.create(person, {age: {value:  13} });
+console.log(zack.age); // => ‘13’
+
+
+var zack = Object.create(person);
+Object.getPrototypeOf(zack); //=> person
+
+
+function Foo(){}
+
+var foo = new Foo();
+
+//foo is now an instance of Foo
+console.log(foo instanceof Foo ) //=> true
+
+new keyword:
+function Foo() {
+  this.kind = ‘foo’
+}
+
+var foo = new Foo(); 
+foo.kind //=> ‘foo’
+
+-->
+
+function Foo() {
+  var this = {}; // this is not valid, just for illustration
+  this.__proto__ = Foo.prototype;
+  
+  this.kind = ‘foo’
+  
+  return this;
+}
+
+function prototype:
+The ‘prototype’ property points to the object that will be asigned as the prototype of instances created with that function when using ‘new’. 
+
+function Person(name) {
+  this.name = name;
+}
+
+// the function person has a prototype property
+// we can add properties to this function prototype
+Person.prototype.kind = ‘person’
+
+// when we create a new object using new
+var zack = new Person(‘Zack’);
+
+// the prototype of the new object points to person.prototype
+zack.__proto__ == Person.prototype //=> true
+
+// in the new object we have access to properties defined in Person.prototype
+zack.kind //=> person
+

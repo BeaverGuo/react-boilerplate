@@ -105,15 +105,15 @@ function instantiateReactComponent(node) {
     process.env.NODE_ENV !== 'production' ? warning(typeof instance.mountComponent === 'function' && typeof instance.receiveComponent === 'function' && typeof instance.getNativeNode === 'function' && typeof instance.unmountComponent === 'function', 'Only React Components can be mounted.') : void 0;
   }
 
-  // These two fields are used by the DOM and ART diffing algorithms
+  // These two fields are used by the DOM and ART diffing algorithms   ?
   // respectively. Instead of using expandos on components, we should be
   // storing the state needed by the diffing algorithms elsewhere.
   instance._mountIndex = 0;
   instance._mountImage = null;
 
   if (process.env.NODE_ENV !== 'production') {
-    instance._isOwnerNecessary = false;
-    instance._warnedAboutRefsInRender = false;
+    instance._isOwnerNecessary = false;//?
+    instance._warnedAboutRefsInRender = false;//?
   }
 
   if (process.env.NODE_ENV !== 'production') {

@@ -649,3 +649,148 @@ function isFunction(value) {
   var tag = isObject(value) ? objectToString.call(value) : '';
   return tag == funcTag || tag == genTag;
 }
+
+
+
+
+
+1.质量管理单元工程填报的render部分 code-tracing:
+const ProjectFill = ({
+
+}) => 
+  <div className={styles.pF}>
+    <CellDetail fill={true} />
+    <ThreeStepsContainer />
+  </div>
+
+export default ProjectFill;
+
+经过一堆webpack,mainjs啥的跳过了,然后猜测是通过路由进到QualManaPrjFill组件(整个页面包括listBox和mainBox)的render里面
+render(){
+    let data = this.dataFormat();//执行这个会调用createPrototypeProxy.js应该是由this触发的吧?
+    let tmpMainBox;
+    tmpMainBox = this.props.mainBox === undefined ? (<DefaultDisplay defaultIndx={1} />) : this.props.mainBox;
+    return (//进到return里面之后跳转到ReactElementValidator.js里的createElement function.
+       <div>
+          <div className={sideBarStyles.listBox}>
+            <div>
+                <SearchBar placeholder="..." onChange={this.onChange} onSearch={this.onSearch} filterType={2}/>
+                <TreeView onHighLight={(data)=>this.onHighLight(data)} onAction={(data)=>this.onAction(data)} data={data} />
+            </div>
+          </div>
+          <div className={`${mainStyles.mainBox}`}>
+            {tmpMainBox}
+          </div>
+       </div> 
+   )
+}
+//render从最里面开始创建React element, SearchBar-->TreeView-->div-->div ...
+进入dataFormat函数
+dataFormat(){
+        console.log('format',this.props.loadingIndex);
+        const dataSource=[{
+            name: '杨房沟工程',
+            icon: "folder",
+            fold: "expanded",
+            action: 'link',
+            actionData:{linkURL:'/qualityMana/unitProjectReport/fill'},
+            }
+        ];
+        let check = new CheckObj(),//这里进入class CheckObj
+        treeData = check.check(this.props.treeData);//immutable data 进入immutableJS里面的toJS()
+
+class CheckObj {
+  constructor() {//入constructor
+    
+    }
+mainjs
+function _classCallCheck(instance, Constructor) {//instance是CheckObj,因为没有extend所以CheckObj里面只有一个prototype里面是它的函数,prototype再往上连接着Object.__proto__,constructor是function CheckObj(){}
+ if (!(instance instanceof Constructor)) {//instance check
+    throw new TypeError("Cannot call a class as a function"); 
+  } 
+}
+
+doc:
+function Welcome(props) {
+  return <h1>Hello, {props.name}</h1>;
+}
+
+const element = <Welcome name="Sara" />;
+ReactDOM.render(
+  element,
+  document.getElementById('root')
+);
+Try it on CodePen.
+
+Let's recap what happens in this example:
+
+We call ReactDOM.render() with the <Welcome name="Sara" /> element.
+React calls the Welcome component with {name: 'Sara'} as the props.
+Our Welcome component returns a <h1>Hello, Sara</h1> element as the result.
+React DOM efficiently updates the DOM to match <h1>Hello, Sara</h1>.
+Components must return a single root element. This is why we added a <div> to contain all the <Welcome /> elements.
+Props are Read-Only.Such functions are called "pure" because they do not attempt to change their inputs, and always return the same result for the same inputs.
+
+
+/**
+ * ------------------ The Life-Cycle of a Composite Component ------------------
+ *
+ * - constructor: Initialization of state. The instance is now retained.
+ *   - componentWillMount
+ *   - render
+ *   - [children's constructors]
+ *     - [children's componentWillMount and render]
+ *     - [children's componentDidMount]
+ *     - componentDidMount
+ *
+ *       Update Phases:
+ *       - componentWillReceiveProps (only called if parent updated)
+ *       - shouldComponentUpdate
+ *         - componentWillUpdate
+ *           - render
+ *           - [children's constructors or receive props phases]
+ *         - componentDidUpdate
+ *
+ *     - componentWillUnmount
+ *     - [children's componentWillUnmount]
+ *   - [children destroyed]
+ * - (destroyed): The instance is now blank, released by React and ready for GC.
+ *
+ * -----------------------------------------------------------------------------
+ */
+
+
+ class Greeting extends React.Component {
+  render() {
+    return (
+      <h1>Hello, {this.props.name}</h1>
+    );
+  }
+}
+
+Greeting.propTypes = {//propTypes是class Greeting的static memeber还是原型链往上找到React啥的?
+  name: React.PropTypes.string
+};
+
+
+调用render(){}
+
+render(){
+  let data = this.dataFormat();
+  let tmpMainBox;
+  tmpMainBox = this.props.mainBox === undefined ? (<DefaultDisplay defaultIndx={1} />) : this.props.mainBox;
+  return (//走到return时直接调了React
+     <div>
+        <div className={sideBarStyles.listBox}>
+          <div>
+              <SearchBar placeholder="..." onChange={this.onChange} onSearch={this.onSearch} filterType={2}/>
+              <TreeView onHighLight={(data)=>this.onHighLight(data)} onAction={(data)=>this.onAction(data)} data={data} />
+          </div>
+        </div>
+        <div className={`${mainStyles.mainBox}`}>
+          {tmpMainBox}
+        </div>
+     </div> 
+ )
+}
+

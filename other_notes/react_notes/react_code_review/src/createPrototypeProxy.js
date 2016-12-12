@@ -27,7 +27,7 @@ function createPrototypeProxy() {
     // Wrap to always call the current version
     return function toString() {
       if (typeof current[name] === 'function') {
-        return current[name].toString();
+        return current[name].toString();//current确实是当前的class,如果是class内部的function,把function转成string,目的是?
       } else {
         return '<method was deleted>';
       }
@@ -37,11 +37,11 @@ function createPrototypeProxy() {
   /**
    * Creates a proxied method that calls the current version, whenever available.
    */
-  function proxyMethod(name) {//current是当前class,proxy?为什么要调用current版本的函数?
+  function proxyMethod(name) {//current是当前class,proxy?为什么要调用current版本的函数?这里的一种情况是this.dataFormat(),dataFormat就是由name参数传入
     // Wrap to always call the current version
     var proxiedMethod = function proxiedMethod() {
       if (typeof current[name] === 'function') {
-        return current[name].apply(this, arguments);//arguments里无this
+        return current[name].apply(this, arguments);//这里的this就是class,why? arguments里无参数this
       }
     };
 

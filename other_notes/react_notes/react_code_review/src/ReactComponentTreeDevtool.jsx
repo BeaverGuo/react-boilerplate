@@ -32,7 +32,7 @@ function updateTree(id, update) {
 }
 
 function purgeDeep(id) {//recursive delete tree id
-  var item = tree[id];
+  var item = tree[id];//debugId都是这个tree里面的?这个是整个app的tree
   if (item) {
     var childIDs = item.childIDs;
 
@@ -42,7 +42,7 @@ function purgeDeep(id) {//recursive delete tree id
 }
 
 var ReactComponentTreeDevtool = {
-  onSetDisplayName: function (id, displayName) {//how to update prop value in a object, pass a callback for updating
+  onSetDisplayName: function (id, displayName) {//给组件树里组件赋值名字.how to update prop value in a object, pass a callback for updating, debugId and 'div'
     updateTree(id, function (item) {
       return item.displayName = displayName;
     });

@@ -1,0 +1,561 @@
+
+
+React element里面的props属性里面的routes数组
+[
+  {
+    "childRoutes": [
+      {
+        "path": "/"
+      },
+      {
+        "path": "/Login"
+      },
+      {
+        "path": "/Download"
+      },
+      {
+        "path": "/HomePage"
+      },
+      {
+        "path": "/features"
+      },
+      {
+        "path": "/allDisplay",
+        "indexRoute": {},
+        "childRoutes": [
+          {
+            "path": "/allDisplay/designModel",
+            "indexRoute": {},
+            "childRoutes": [
+              {
+                "path": "/allDisplay/designModel/MainView/:id"
+              }
+            ]
+          },
+          {
+            "path": "/allDisplay/progressDisplay",
+            "childRoutes": [
+              {
+                "path": "/allDisplay/progressDisplay/MainView/:id"
+              }
+            ]
+          },
+          {
+            "path": "/allDisplay/constructionPlanView"
+          },
+          {
+            "path": "/allDisplay/contrastAnalysis",
+            "childRoutes": [
+              {
+                "path": "/allDisplay/contrastAnalysis/MainView/:id"
+              }
+            ]
+          },
+          {
+            "path": "/allDisplay/qualityControl",
+            "childRoutes": [
+              {
+                "path": "/allDisplay/qualityControl/MainView/:id"
+              }
+            ]
+          },
+          {
+            "path": "/allDisplay/qualityDisplay",
+            "childRoutes": [
+              {
+                "path": "/allDisplay/qualityDisplay/MainView/:id"
+              },
+              {
+                "path": "/allDisplay/qualityDisplay/MainView/show/:id"
+              }
+            ]
+          },
+          {
+            "path": "/allDisplay/investmentDisplay",
+            "childRoutes": [
+              {
+                "path": "/allDisplay/investmentDisplay/MainView/:id"
+              }
+            ]
+          },
+          {
+            "path": "/allDisplay/investmentContrastAnalysis",
+            "childRoutes": [
+              {
+                "path": "/allDisplay/investmentContrastAnalysis/MainView/:id"
+              }
+            ]
+          },
+          {
+            "path": "/allDisplay/investmentGeneralSituation",
+            "childRoutes": [
+              {
+                "path": "/allDisplay/InvestmentGeneralSituation/MainView/:id"
+              }
+            ]
+          },
+          {
+            "path": "/allDisplay/engineeringDocuments",
+            "indexRoute": {},
+            "childRoutes": [
+              {
+                "path": "/allDisplay/engineeringDocuments/MainView/:id"
+              },
+              {
+                "path": "/allDisplay/engineeringDocuments/MainView/show/:id"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "/designMana",
+        "indexRoute": {},
+        "childRoutes": [
+          {
+            "path": "/designMana/drawingNoticeReview",
+            "indexRoute": {}
+          },
+          {
+            "path": "/designMana/drawingReview",
+            "indexRoute": {}
+          },
+          {
+            "path": "/designMana/partialReporting",
+            "indexRoute": {},
+            "childRoutes": [
+              {
+                "path": "/designMana/partialReporting/MainView/:id"
+              }
+            ]
+          },
+          {
+            "path": "/designMana/listMaintenance",
+            "indexRoute": {},
+            "childRoutes": [
+              {
+                "path": "/designMana/listMaintenance/MainView/:id"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "/qualityMana",
+        "indexRoute": {
+          "components": {}
+        },
+        "childRoutes": [
+          {
+            "path": "/qualityMana/processData",
+            "components": {},
+            "childRoutes": [
+              {
+                "path": "/qualityMana/processData/tab1",
+                "components": {}
+              },
+              {
+                "path": "/qualityMana/processData/tab2",
+                "components": {}
+              }
+            ]
+          },
+          {
+            "path": "/qualityMana/unitProjectReport",
+            "components": {},
+            "childRoutes": [
+              {
+                "path": "/qualityMana/unitProjectReport/fill",
+                "components": {}
+              },
+              {
+                "path": "/qualityMana/unitProjectReport/divided",
+                "components": {}
+              }
+            ]
+          },
+          {
+            "path": "/qualityMana/QualityCheck",
+            "components": {},
+            "childRoutes": [
+              {
+                "path": "/qualityMana/QualityCheck/table1",
+                "components": {}
+              }
+            ]
+          },
+          {
+            "path": "/qualityMana/tableManagement",
+            "components": {},
+            "childRoutes": [
+              {
+                "path": "/qualityMana/tableManagement/MainView/:id",
+                "components": {}
+              }
+            ]
+          },
+          {
+            "path": "/qualityMana/selectTable",
+            "components": {}
+          },
+          {
+            "path": "/qualityMana/qualityAssessment",
+            "components": {},
+            "childRoutes": [
+              {
+                "path": "/qualityMana/qualityAssessment/MainView/:id",
+                "components": {}
+              }
+            ]
+          },
+          {
+            "path": "/qualityMana/archiveManagement",
+            "components": {}
+          }
+        ]
+      },
+      {
+        "path": "/progressMana",
+        "indexRoute": {
+          "components": {}
+        },
+        "childRoutes": [
+          {
+            "path": "/progressMana/progressPlan",
+            "components": {}
+          },
+          {
+            "path": "/progressMana/realProgress",
+            "components": {}
+          },
+          {
+            "path": "/progressMana/timeNodeFill",
+            "components": {}
+          },
+          {
+            "path": "/progressMana/accountMana",
+            "components": {}
+          }
+        ]
+      },
+      {
+        "path": "/safetyDet"
+      },
+      {
+        "path": "/detectVideo"
+      },
+      {
+        "path": "/waterCondition"
+      },
+      {
+        "path": "/grout"
+      },
+      {
+        "path": "/concretTemp"
+      },
+      {
+        "path": "/baseData",
+        "indexRoute": {},
+        "childRoutes": [
+          {
+            "path": "/baseData/baseData",
+            "childRoutes": [
+              {
+                "path": "/baseData/baseData/MainBox/:id"
+              }
+            ]
+          },
+          {
+            "path": "/baseData/modelManagement",
+            "indexRoute": {},
+            "childRoutes": [
+              {
+                "path": "/baseData/modelManagement/mappingModel"
+              },
+              {
+                "path": "/baseData/modelManagement/geologyModel"
+              },
+              {
+                "path": "/baseData/modelManagement/electromechanicalModel"
+              },
+              {
+                "path": "/baseData/modelManagement/civilEngineeringModel"
+              },
+              {
+                "path": "/baseData/modelManagement/constructionInfo"
+              },
+              {
+                "path": "/baseData/modelManagement/constructionModel"
+              },
+              {
+                "path": "/baseData/modelManagement/modelVersion"
+              }
+            ]
+          },
+          {
+            "path": "/baseData/engineeringData",
+            "indexRoute": {},
+            "childRoutes": [
+              {
+                "path": "/baseData/engineeringData/constructionObject"
+              },
+              {
+                "path": "/baseData/engineeringData/participatingUnit"
+              },
+              {
+                "path": "/baseData/engineeringData/personnelData"
+              },
+              {
+                "path": "/baseData/engineeringData/positionData"
+              },
+              {
+                "path": "/baseData/engineeringData/qualityCheckTemplate"
+              },
+              {
+                "path": "/baseData/engineeringData/systemData"
+              }
+            ]
+          },
+          {
+            "path": "/baseData/investInfo",
+            "indexRoute": {},
+            "childRoutes": [
+              {
+                "path": "/baseData/investInfo/EngineeringQuantityModel"
+              },
+              {
+                "path": "/baseData/investInfo/InviteBidsQuantityModel"
+              },
+              {
+                "path": "/baseData/investInfo/ContractEngineeringQuantityModel"
+              },
+              {
+                "path": "/baseData/investInfo/ContractEngineeringQuantityModelChange"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "/systemMana",
+        "indexRoute": {
+          "components": {}
+        },
+        "childRoutes": [
+          {
+            "path": "/systemMana/userMana",
+            "components": {},
+            "childRoutes": [
+              {
+                "path": "/systemMana/userMana/accMana",
+                "components": {}
+              },
+              {
+                "path": "/systemMana/userMana/roleMana",
+                "components": {}
+              },
+              {
+                "path": "/systemMana/userMana/authMana",
+                "components": {}
+              },
+              {
+                "path": "/systemMana/userMana/chPwd",
+                "components": {}
+              }
+            ]
+          },
+          {
+            "path": "/systemMana/sysSet",
+            "components": {},
+            "childRoutes": [
+              {
+                "path": "/systemMana/sysSet/disp",
+                "components": {}
+              },
+              {
+                "path": "/systemMana/sysSet/unit",
+                "components": {}
+              },
+              {
+                "path": "/systemMana/sysSet/flow",
+                "components": {}
+              },
+              {
+                "path": "/systemMana/sysSet/rule",
+                "components": {}
+              },
+              {
+                "path": "/systemMana/sysSet/dir",
+                "components": {}
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "/userCenter",
+        "indexRoute": {},
+        "childRoutes": [
+          {
+            "path": "/userCenter/taskManagement",
+            "childRoutes": [
+              {
+                "path": "/userCenter/taskManagement/MainView/cellPrjFill"
+              },
+              {
+                "path": "/userCenter/taskManagement/MainView/progressPlanFill"
+              },
+              {
+                "path": "/userCenter/taskManagement/MainView/realProgressFill"
+              },
+              {
+                "path": "/userCenter/taskManagement/MainView/qualityTable"
+              },
+              {
+                "path": "/userCenter/taskManagement/MainView/timeNodeFill"
+              },
+              {
+                "path": "/userCenter/taskManagement/MainView/accountManage"
+              },
+              {
+                "path": "/userCenter/taskManagement/MainView/drawing"
+              },
+              {
+                "path": "/userCenter/taskManagement/MainView/modDrawing"
+              },
+              {
+                "path": "/userCenter/taskManagement/MainView/itemPrjFill"
+              },
+              {
+                "path": "/userCenter/taskManagement/MainView/cellArchive"
+              }
+            ]
+          },
+          {
+            "path": "/userCenter/processAlert",
+            "childRoutes": [
+              {
+                "path": "/userCenter/processAlert/MainView/:id"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "/testPage"
+      },
+      {
+        "path": "/testApi"
+      }
+    ]
+  },
+  {
+    "path": "/qualityMana",
+    "indexRoute": {
+      "components": {}
+    },
+    "childRoutes": [
+      {
+        "path": "/qualityMana/processData",
+        "components": {},
+        "childRoutes": [
+          {
+            "path": "/qualityMana/processData/tab1",
+            "components": {}
+          },
+          {
+            "path": "/qualityMana/processData/tab2",
+            "components": {}
+          }
+        ]
+      },
+      {
+        "path": "/qualityMana/unitProjectReport",
+        "components": {},
+        "childRoutes": [
+          {
+            "path": "/qualityMana/unitProjectReport/fill",
+            "components": {}
+          },
+          {
+            "path": "/qualityMana/unitProjectReport/divided",
+            "components": {}
+          }
+        ]
+      },
+      {
+        "path": "/qualityMana/QualityCheck",
+        "components": {},
+        "childRoutes": [
+          {
+            "path": "/qualityMana/QualityCheck/table1",
+            "components": {}
+          }
+        ]
+      },
+      {
+        "path": "/qualityMana/tableManagement",
+        "components": {},
+        "childRoutes": [
+          {
+            "path": "/qualityMana/tableManagement/MainView/:id",
+            "components": {}
+          }
+        ]
+      },
+      {
+        "path": "/qualityMana/selectTable",
+        "components": {}
+      },
+      {
+        "path": "/qualityMana/qualityAssessment",
+        "components": {},
+        "childRoutes": [
+          {
+            "path": "/qualityMana/qualityAssessment/MainView/:id",
+            "components": {}
+          }
+        ]
+      },
+      {
+        "path": "/qualityMana/archiveManagement",
+        "components": {}
+      }
+    ]
+  },
+  {
+    "path": "/qualityMana/unitProjectReport",
+    "components": {},
+    "childRoutes": [
+      {
+        "path": "/qualityMana/unitProjectReport/fill",
+        "components": {}
+      },
+      {
+        "path": "/qualityMana/unitProjectReport/divided",
+        "components": {}
+      }
+    ]
+  },
+  {
+    "path": "/qualityMana/unitProjectReport/fill",
+    "components": {}
+  }
+]
+
+route对象
+
+{
+  "path": "/qualityMana/unitProjectReport",
+  "components": {},
+  "childRoutes": [
+    {
+      "path": "/qualityMana/unitProjectReport/fill",
+      "components": {}
+    },
+    {
+      "path": "/qualityMana/unitProjectReport/divided",
+      "components": {}
+    }
+  ]
+}

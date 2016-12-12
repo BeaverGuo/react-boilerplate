@@ -68,7 +68,7 @@ function isInternalComponentType(type) {
 var nextDebugID = 1;
 
 /**
- * Given a ReactNode, create an instance that will actually be mounted.
+ * Given a ReactNode, create an instance that will actually be mounted. ReactDOM or real DOM?
  *
  * @param {ReactNode} node
  * @return {object} A new instance of the element's constructor.

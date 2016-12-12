@@ -30,7 +30,7 @@ var warning = require('fbjs/lib/warning');
 
 function getDeclarationErrorAddendum() {
   if (ReactCurrentOwner.current) {
-    var name = ReactCurrentOwner.current.getName();
+    var name = ReactCurrentOwner.current.getName();//ReactCurrentOwner是什么?ReactCurrentOwner.current是一个ReactCompositeComponent对象
     if (name) {
       return ' Check the render method of `' + name + '`.';
     }
@@ -135,7 +135,7 @@ function validateChildKeys(node, parentType) {
     }
   } else if (ReactElement.isValidElement(node)) {
     // This element was passed in a valid location.
-    if (node._store) {
+    if (node._store) {//验证child
       node._store.validated = true;
     }
   } else if (node) {
@@ -175,7 +175,7 @@ function checkPropTypes(componentName, propTypes, props, location) {
         // This is intentionally an invariant that gets caught. It's the same
         // behavior as without this statement except with a better message.
         !(typeof propTypes[propName] === 'function') ? process.env.NODE_ENV !== 'production' ? invariant(false, '%s: %s type `%s` is invalid; it must be a function, usually from ' + 'React.PropTypes.', componentName || 'React class', ReactPropTypeLocationNames[location], propName) : invariant(false) : void 0;
-        error = propTypes[propName](props, propName, componentName, location);
+        error = propTypes[propName](props, propName, componentName, location);//怎么跳到ReactPropTypes.js的?
       } catch (ex) {
         error = ex;
       }
@@ -213,14 +213,14 @@ function validatePropTypes(element) {
 }
 
 var ReactElementValidator = {
-
-  createElement: function (type, props, children) {
+  //<SearchBar placeholder="..." onChange={this.onChange} onSearch={this.onSearch} filterType={2}/>为例
+  createElement: function (type, props, children) {//type是class function,props是filterType,onChange这些属性,这里没有children,所以是undefined
     var validType = typeof type === 'string' || typeof type === 'function';
     // We warn in this case but don't throw. We expect the element creation to
     // succeed and there will likely be errors in render.
     process.env.NODE_ENV !== 'production' ? warning(validType, 'React.createElement: type should not be null, undefined, boolean, or ' + 'number. It should be a string (for DOM elements) or a ReactClass ' + '(for composite components).%s', getDeclarationErrorAddendum()) : void 0;
 
-    var element = ReactElement.createElement.apply(this, arguments);//create react element?
+    var element = ReactElement.createElement.apply(this, arguments);//调用ReactElement.js
 
     // The result can be nullish if a mock or a custom function is used.
     // TODO: Drop this when these are no longer allowed as the type argument.

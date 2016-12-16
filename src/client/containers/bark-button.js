@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
-import Button from '../components/button';
+import Button from '../components/button.jsx';
 import { makeBark } from '../actions/dog-actions';
 
 const mapDispatchToProps = dispatch => ({
-  action: () => { dispatch(makeBark()); },
-  actionLabel: 'Bark',
+    action: () => { dispatch(makeBark()); },
+    actionLabel: 'Bark',
 });
 
 export default connect(null, mapDispatchToProps)(Button);

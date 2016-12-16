@@ -23,6 +23,6 @@ You want to port your app to Flux or Redux;
 You noticed it's hard for Stores (or Reducers) to consume data from nested API responses.
 
 seems important to notice this point
-I’m sure I’m not the only one who didn’t focus on this on my read through the docs. Unfortunately missing, and failing to internalize this advice will likely add a great deal of complexity and difficulty to your application
+I’m sure I’m not the only one who didn’t focus on this on my read through the docs. Unfortunately missing, and failing to internalize this advice will likely add a great deal of complexity and difficulty to your application.
 
 

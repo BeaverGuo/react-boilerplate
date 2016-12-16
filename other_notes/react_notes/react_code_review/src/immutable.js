@@ -53,7 +53,7 @@
   }
 
   function isIndexed(maybeIndexed) {
-    return !!(maybeIndexed && maybeIndexed[IS_INDEXED_SENTINEL]);
+    return !!(maybeIndexed && maybeIndexed[IS_INDEXED_SENTINEL]);//treeData是一个IndexedIterable list,prototype继承到Collection再到Iterable
   }
 
   function isAssociative(maybeAssociative) {
@@ -2345,7 +2345,7 @@
         if (from === to) {
           return DONE;
         }
-        var idx = reverse ? --to : from++;
+        var idx = reverse ? --to : from++;//idx从0开始
         return array && array[idx];
       };
     }
@@ -2353,7 +2353,7 @@
     function iterateNode(node, level, offset) {
       var values;
       var array = node && node.array;
-      var from = offset > left ? 0 : (left - offset) >> level;
+      var from = offset > left ? 0 : (left - offset) >> level;//level是5难道表示32bit?
       var to = ((right - offset) >> level) + 1;
       if (to > SIZE) {
         to = SIZE;
@@ -2639,7 +2639,7 @@
   }
 
   function getTailOffset(size) {
-    return size < SIZE ? 0 : (((size - 1) >>> SHIFT) << SHIFT);
+    return size < SIZE ? 0 : (((size - 1) >>> SHIFT) << SHIFT);//getTailOffset这个移位可以小于SIZE的都为0,大于的不变
   }
 
   createClass(OrderedMap, Map);
@@ -2857,7 +2857,7 @@
 
 
   createClass(ToIndexedSequence, IndexedSeq);
-    function ToIndexedSequence(iter) {
+    function ToIndexedSequence(iter) {//new了之后__proto__ link到ToIndexedSequence再link到Seq
       this._iter = iter;
       this.size = iter.size;
     }
@@ -3006,7 +3006,7 @@
 
 
   function mapFactory(iterable, mapper, context) {//iterable is ObjectSeq
-    var mappedSequence = makeSequence(iterable);
+    var mappedSequence = makeSequence(iterable);//list对象为什么mappedSequence是IndexedIterable对象?
     mappedSequence.size = iterable.size;
     mappedSequence.has = function(key ) {return iterable.has(key)};
     mappedSequence.get = function(key, notSetValue)  {
@@ -3015,7 +3015,7 @@
         notSetValue :
         mapper.call(context, v, key, iterable);
     };
-    mappedSequence.__iterateUncached = function (fn, reverse) {var this$0 = this;
+    mappedSequence.__iterateUncached = function (fn, reverse) {var this$0 = this;//没看明白
       return iterable.__iterate(
         function(v, k, c)  {return fn(mapper.call(context, v, k, c), k, this$0) !== false},
         reverse
@@ -3594,10 +3594,10 @@
   function makeSequence(iterable) {
     return Object.create(//Object.create receive prototype, object type
       (
-        isKeyed(iterable) ? KeyedSeq :
+        isKeyed(iterable) ? KeyedSeq ://list不是keyed
         isIndexed(iterable) ? IndexedSeq :
         SetSeq
-      ).prototype
+      ).prototype//返回prototype
     );
   }
 
@@ -4264,13 +4264,13 @@
     },
 
     toIndexedSeq: function() {
-      return new ToIndexedSequence(this);
+      return new ToIndexedSequence(this);//__proto__ link到ToIndexedSequence?
     },
 
     toJS: function() {
-      return this.toSeq().map(
+      return this.toSeq().map(//this对应调用toJS的immutable object
         function(value ) {return value && typeof value.toJS === 'function' ? value.toJS() : value}
-      ).__toJS();
+      ).__toJS();//__toJS()怎么调到toArray()了?IterablePrototype.__toJS = IterablePrototype.toArray;
     },
 
     toJSON: function() {
@@ -4401,8 +4401,8 @@
       return this.__iterator(ITERATE_KEYS);
     },
 
-    map: function(mapper, context) {
-      return reify(this, mapFactory(this, mapper, context));
+    map: function(mapper, context) {//map接收一个匿名函数mapper传入mapFactory
+      return reify(this, mapFactory(this, mapper, context));//mapFactory构造一个map对象
     },
 
     reduce: function(reducer, initialReduction, context) {

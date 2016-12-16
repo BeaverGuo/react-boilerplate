@@ -19,7 +19,7 @@ var invariant = require('fbjs/lib/invariant');
 var ATTR_NAME = DOMProperty.ID_ATTRIBUTE_NAME;
 var Flags = ReactDOMComponentFlags;
 
-var internalInstanceKey = '__reactInternalInstance$' + Math.random().toString(36).slice(2);
+var internalInstanceKey = '__reactInternalInstance$' + Math.random().toString(36).slice(2);//随机数
 
 /**
  * Drill down (through composites and empty components) until we get a native or
@@ -40,10 +40,10 @@ function getRenderedNativeOrTextFromComponent(component) {
  * Populate `_nativeNode` on the rendered native/text component with the given
  * DOM node. The passed `inst` can be a composite.
  */
-function precacheNode(inst, node) {
+function precacheNode(inst, node) {//inst是ReactDOM,node is real DOM
   var nativeInst = getRenderedNativeOrTextFromComponent(inst);
   nativeInst._nativeNode = node;
-  node[internalInstanceKey] = nativeInst;
+  node[internalInstanceKey] = nativeInst;//nativeInst添加DOM/_nativeNode
 }
 
 function uncacheNode(inst) {

@@ -77,8 +77,8 @@ function invokeComponentDidUpdateWithTimer(prevProps, prevState, prevContext) {
   }
 }
 
-function shouldConstruct(Component) {
-  return Component.prototype && Component.prototype.isReactComponent;
+function shouldConstruct(Component) {//class的prototype连接着ReactComponent.prototype
+  return Component.prototype && Component.prototype.isReactComponent;//ReactComponent.__proto__连接一个对象,其中包含isReactComponent这个对象,返回这个对象?
 }
 
 /**
@@ -170,14 +170,14 @@ var ReactCompositeComponentMixin = {
     this._context = context;
     this._mountOrder = nextMountID++;
     this._nativeParent = nativeParent;
-    this._nativeContainerInfo = nativeContainerInfo;
+    this._nativeContainerInfo = nativeContainerInfo;//container是div#app
 
-    var publicProps = this._processProps(this._currentElement.props);
+    var publicProps = this._processProps(this._currentElement.props);//this._currentElement就是当前的class,将其props传入
     var publicContext = this._processContext(context);
 
     var Component = this._currentElement.type;
 
-    // Initialize the public class
+    // Initialize the public class例化
     var inst = this._constructComponent(publicProps, publicContext);
     var renderedElement;
 
@@ -197,7 +197,7 @@ var ReactCompositeComponentMixin = {
       }
 
       var propsMutated = inst.props !== publicProps;
-      var componentName = Component.displayName || Component.name || 'Component';
+      var componentName = Component.displayName || Component.name || 'Component';//默认叫Component
 
       process.env.NODE_ENV !== 'production' ? warning(inst.props === undefined || !propsMutated, '%s(...): When calling super() in `%s`, make sure to pass ' + 'up the same props that your component\'s constructor was passed.', componentName, componentName) : void 0;
     }
@@ -205,7 +205,7 @@ var ReactCompositeComponentMixin = {
     // These should be set up in the constructor, but as a convenience for
     // simpler class abstractions, we set them up after the fact.
     inst.props = publicProps;
-    inst.context = publicContext;
+    inst.context = publicContext;//publicContext居然是Object
     inst.refs = emptyObject;
     inst.updater = ReactUpdateQueue;
 
@@ -240,7 +240,7 @@ var ReactCompositeComponentMixin = {
     var markup;
     if (inst.unstable_handleError) {
       markup = this.performInitialMountWithErrorHandling(renderedElement, nativeParent, nativeContainerInfo, transaction, context);
-    } else {
+    } else {//renderedElement undefined? nativeParent是div.sideBox(sideBox包含listBox and mainBox),nativeContainerInfo是div#app,context是history,location,router and store.
       markup = this.performInitialMount(renderedElement, nativeParent, nativeContainerInfo, transaction, context);
     }
 
@@ -255,21 +255,21 @@ var ReactCompositeComponentMixin = {
     return markup;
   },
 
-  _constructComponent: function (publicProps, publicContext) {
+  _constructComponent: function (publicProps, publicContext) {//publicProps是组件传入的props包括redux传入的
     if (process.env.NODE_ENV !== 'production') {
       ReactCurrentOwner.current = this;
       try {
         return this._constructComponentWithoutOwner(publicProps, publicContext);
       } finally {
-        ReactCurrentOwner.current = null;
+        ReactCurrentOwner.current = null;//ReactCurrentOwner构造完复位?
       }
     } else {
       return this._constructComponentWithoutOwner(publicProps, publicContext);
     }
   },
 
-  _constructComponentWithoutOwner: function (publicProps, publicContext) {
-    var Component = this._currentElement.type;
+  _constructComponentWithoutOwner: function (publicProps, publicContext) {//这个构造不是很懂
+    var Component = this._currentElement.type;//Component是construct function
     var instanceOrElement;
     if (shouldConstruct(Component)) {
       if (process.env.NODE_ENV !== 'production') {
@@ -277,7 +277,7 @@ var ReactCompositeComponentMixin = {
           ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'ctor');
         }
       }
-      instanceOrElement = new Component(publicProps, publicContext, ReactUpdateQueue);
+      instanceOrElement = new Component(publicProps, publicContext, ReactUpdateQueue);//ReactUpdateQueue是啥?
       if (process.env.NODE_ENV !== 'production') {
         if (this._debugID !== 0) {
           ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'ctor');
@@ -330,7 +330,7 @@ var ReactCompositeComponentMixin = {
     if (inst.componentWillMount) {
       if (process.env.NODE_ENV !== 'production') {
         if (this._debugID !== 0) {
-          ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'componentWillMount');
+          ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'componentWillMount');//这个是生命周期开始和结束?
         }
       }
       inst.componentWillMount();
@@ -347,14 +347,14 @@ var ReactCompositeComponentMixin = {
     }
 
     // If not a stateless component, we now render
-    if (renderedElement === undefined) {
+    if (renderedElement === undefined) {//第一个参数有值则不是无态组件?
       renderedElement = this._renderValidatedComponent();
     }
 
-    this._renderedNodeType = ReactNodeTypes.getType(renderedElement);
+    this._renderedNodeType = ReactNodeTypes.getType(renderedElement);//render执行后是怎么跑到这里来的? 0 for NATIVE
     this._renderedComponent = this._instantiateReactComponent(renderedElement);
 
-    var markup = ReactReconciler.mountComponent(this._renderedComponent, transaction, nativeParent, nativeContainerInfo, this._processChildContext(context));
+    var markup = ReactReconciler.mountComponent(this._renderedComponent, transaction, nativeParent, nativeContainerInfo, this._processChildContext(context));//这里mount组件
 
     if (process.env.NODE_ENV !== 'production') {
       if (this._debugID !== 0) {
@@ -486,7 +486,7 @@ var ReactCompositeComponentMixin = {
     if (process.env.NODE_ENV !== 'production') {
       ReactInstrumentation.debugTool.onBeginProcessingChildContext();
     }
-    var childContext = inst.getChildContext && inst.getChildContext();
+    var childContext = inst.getChildContext && inst.getChildContext();//childContext为undefined
     if (process.env.NODE_ENV !== 'production') {
       ReactInstrumentation.debugTool.onEndProcessingChildContext();
     }
@@ -503,7 +503,7 @@ var ReactCompositeComponentMixin = {
     return currentContext;
   },
 
-  /**
+  /**相当于给props默认值,因为props read-only所以并不改变props
    * Processes props by setting default values for unspecified props and
    * asserting that the props are valid. Does not mutate its argument; returns
    * a new props object with defaults merged in.
@@ -514,9 +514,9 @@ var ReactCompositeComponentMixin = {
    */
   _processProps: function (newProps) {
     if (process.env.NODE_ENV !== 'production') {
-      var Component = this._currentElement.type;
+      var Component = this._currentElement.type;//type就是function QualManaPrjFill(){}
       if (Component.propTypes) {
-        this._checkPropTypes(Component.propTypes, newProps, ReactPropTypeLocations.prop);
+        this._checkPropTypes(Component.propTypes, newProps, ReactPropTypeLocations.prop);//ReactPropTypeLocations.prop不知是啥?
       }
     }
     return newProps;
@@ -812,7 +812,7 @@ var ReactCompositeComponentMixin = {
         ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'render');
       }
     }
-    var renderedComponent = inst.render();
+    var renderedComponent = inst.render();//调用组件render方法进入function proxyMethod(name){}
     if (process.env.NODE_ENV !== 'production') {
       if (this._debugID !== 0) {
         ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'render');
@@ -888,8 +888,8 @@ var ReactCompositeComponentMixin = {
    * @internal
    */
   getName: function () {//get component name
-    var type = this._currentElement.type;
-    var constructor = this._instance && this._instance.constructor;
+    var type = this._currentElement.type;//this是当前的class还是外面的环境?this._currentElement是React element class,eg: class QualManaPrjFill
+    var constructor = this._instance && this._instance.constructor;//&&运算2者都为true取后者
     return type.displayName || constructor && constructor.displayName || type.name || constructor && constructor.name || null;
   },
 

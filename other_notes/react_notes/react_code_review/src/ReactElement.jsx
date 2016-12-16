@@ -20,7 +20,7 @@ var canDefineProperty = require('./canDefineProperty');
 
 // The Symbol used to tag the ReactElement type. If there is no native Symbol
 // nor polyfill, then a plain number is used for performance.
-var REACT_ELEMENT_TYPE = typeof Symbol === 'function' && Symbol['for'] && Symbol['for']('react.element') || 0xeac7;//??
+var REACT_ELEMENT_TYPE = typeof Symbol === 'function' && Symbol['for'] && Symbol['for']('react.element') || 0xeac7;//??  0xeac7是什么意思
 
 var RESERVED_PROPS = {
   key: true,
@@ -71,7 +71,7 @@ var ReactElement = function (type, key, ref, self, source, owner, props) {
     // an external backing store so that we can freeze the whole object.
     // This can be replaced with a WeakMap once they are implemented in
     // commonly used development environments.
-    element._store = {};
+    element._store = {};//这个怎么理解?
 
     // To make comparing ReactElements easier for testing purposes, we make
     // the validation flag non-enumerable (where possible, which should
@@ -105,7 +105,7 @@ var ReactElement = function (type, key, ref, self, source, owner, props) {
       element._source = source;
     }
     if (Object.freeze) {
-      Object.freeze(element.props);//free an object, aka make it immutable
+      Object.freeze(element.props);//free an object, aka make it immutable,为啥?
       Object.freeze(element);
     }
   }
@@ -135,17 +135,17 @@ ReactElement.createElement = function (type, config, children) {//<Router></Rout
       config.__proto__ == null || config.__proto__ === Object.prototype,
       /* eslint-enable no-proto */
       'React.createElement(...): Expected props argument to be a plain object. ' + 'Properties defined in its prototype chain will be ignored.') : void 0;
-      ref = !config.hasOwnProperty('ref') || Object.getOwnPropertyDescriptor(config, 'ref').get ? null : config.ref;//config's ref have a get(){}
+      ref = !config.hasOwnProperty('ref') || Object.getOwnPropertyDescriptor(config, 'ref').get ? null : config.ref;//属性里面如果有ref 就定义其get(){}
       key = !config.hasOwnProperty('key') || Object.getOwnPropertyDescriptor(config, 'key').get ? null : '' + config.key;
     } else {
       ref = config.ref === undefined ? null : config.ref;
       key = config.key === undefined ? null : '' + config.key;
     }
-    self = config.__self === undefined ? null : config.__self;
+    self = config.__self === undefined ? null : config.__self;//ref里的__self是啥?
     source = config.__source === undefined ? null : config.__source;
     // Remaining properties are added to a new props object
     for (propName in config) {//shallow copy config to props , RESERVED_PROPS key ref __self __source for what?
-      if (config.hasOwnProperty(propName) && !RESERVED_PROPS.hasOwnProperty(propName)) {
+      if (config.hasOwnProperty(propName) && !RESERVED_PROPS.hasOwnProperty(propName)) {//防止保留属性被覆盖
         props[propName] = config[propName];
       }
     }
@@ -155,7 +155,7 @@ ReactElement.createElement = function (type, config, children) {//<Router></Rout
   // the newly allocated props object.
   var childrenLength = arguments.length - 2;
   if (childrenLength === 1) {
-    props.children = children;
+    props.children = children;//如果有children将children放到props里面
   } else if (childrenLength > 1) {
     var childArray = Array(childrenLength);
     for (var i = 0; i < childrenLength; i++) {
@@ -165,11 +165,11 @@ ReactElement.createElement = function (type, config, children) {//<Router></Rout
   }
 
   // Resolve default props
-  if (type && type.defaultProps) {
+  if (type && type.defaultProps) {//type是有defaultProps的{autoFocus:true,delay:200,filterType:1}filterType为啥是1?
     var defaultProps = type.defaultProps;//defaultProps is render function?
     for (propName in defaultProps) {
       if (props[propName] === undefined) {
-        props[propName] = defaultProps[propName];
+        props[propName] = defaultProps[propName];//赋默认值
       }
     }
   }
@@ -178,7 +178,7 @@ ReactElement.createElement = function (type, config, children) {//<Router></Rout
     // against its use
     if (typeof props.$$typeof === 'undefined' || props.$$typeof !== REACT_ELEMENT_TYPE) {
       if (!props.hasOwnProperty('key')) {
-        Object.defineProperty(props, 'key', {//define a key getter function if not have,Object.defineProperty()
+        Object.defineProperty(props, 'key', {//define a key getter function if not have,Object.defineProperty(),get('key')告警
           get: function () {
             if (!specialPropKeyWarningShown) {
               specialPropKeyWarningShown = true;

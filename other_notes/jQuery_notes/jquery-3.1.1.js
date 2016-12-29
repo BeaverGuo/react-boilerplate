@@ -1,6 +1,5 @@
-/*eslint-disable no-unused-vars*/
 /*!
- * jQuery JavaScript Library v3.1.0
+ * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
  *
  * Includes Sizzle.js
@@ -10,9 +9,9 @@
  * Released under the MIT license
  * https://jquery.org/license
  *
- * Date: 2016-07-07T21:44Z
+ * Date: 2016-09-22T22:30Z
  */
-( function( global, factory ) {
+( function( global, factory ) { //名字是global所以不一定是window
 
 	"use strict";
 
@@ -38,7 +37,7 @@
 	}
 
 // Pass this if window is not defined yet
-} )( typeof window !== "undefined" ? window : this, function( window, noGlobal ) {
+} )( typeof window !== "undefined" ? window : this, function( window, noGlobal ) {//这里做了个保险考虑如果window是undefined的情况,以前会把undefined传入防止其被修改
 
 // Edge <= 12 - 13+, Firefox <=18 - 45+, IE 10 - 11, Safari 5.1 - 9+, iOS 6 - 9.1
 // throw exceptions when non-strict code (e.g., ASP.NET 4.5) accesses strict mode
@@ -48,7 +47,7 @@
 
 var arr = [];
 
-var document = window.document;
+var document = window.document;//通过闭包传入window对象，防止document被其他插件修改，下面也是一样的道理
 
 var getProto = Object.getPrototypeOf;
 
@@ -60,7 +59,7 @@ var push = arr.push;
 
 var indexOf = arr.indexOf;
 
-var class2type = {};
+var class2type = {};//事先存储好toString和hasOwnProperty提高程序运行效率
 
 var toString = class2type.toString;
 
@@ -83,30 +82,31 @@ var support = {};
 		doc.head.appendChild( script ).parentNode.removeChild( script );
 	}
 /* global Symbol */
-// Defining this global in .eslintrc would create a danger of using the global
+// Defining this global in .eslintrc.json would create a danger of using the global
 // unguarded in another place, it seems safer to define global only for this module
 
 
 
 var
-	version = "3.1.0",
+	version = "3.1.1",
 
 	// Define a local copy of jQuery
 	jQuery = function( selector, context ) {
 
 		// The jQuery object is actually just the init constructor 'enhanced'
 		// Need init if jQuery is called (just allow error to be thrown if not included)
-		return new jQuery.fn.init( selector, context );
+		return new jQuery.fn.init( selector, context );//每次调用jquery的时候都在这里返回一个jquery对象，外面不需要new来例化了
 	},
 
 	// Support: Android <=4.0 only
 	// Make sure we trim BOM and NBSP
-	rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,
-
+	rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,//全局匹配所有空格多次，trim BOM是啥意思
 	// Matches dashed string for camelizing
-	rmsPrefix = /^-ms-/,
-	rdashAlpha = /-([a-z])/g,
+	rmsPrefix = /^-ms-/,//匹配 -ms-开头 的有啥用?
+	rdashAlpha = /-([a-z])/g,//匹配 -加小写字母
 
+
+// /^<\.+>$/相当于 if (selector.charAt(0) === "<" && selector.charAt(selector.length - 1) === ">" && selector.length >= 3)
 	// Used by jQuery.camelCase as callback to replace()
 	fcamelCase = function( all, letter ) {
 		return letter.toUpperCase();
@@ -117,7 +117,7 @@ jQuery.fn = jQuery.prototype = {
 	// The current version of jQuery being used
 	jquery: version,
 
-	constructor: jQuery,
+	constructor: jQuery,//采用对象字面量方法重写了jQuery的prototype如果不加这个会指向Object
 
 	// The default length of a jQuery object is 0
 	length: 0,
@@ -129,13 +129,14 @@ jQuery.fn = jQuery.prototype = {
 	// Get the Nth element in the matched element set OR
 	// Get the whole matched element set as a clean array
 	get: function( num ) {
-		return num != null ?
 
-			// Return just the one element from the set
-			( num < 0 ? this[ num + this.length ] : this[ num ] ) :
+		// Return all the elements in a clean array
+		if ( num == null ) {
+			return slice.call( this );
+		}
 
-			// Return all the elements in a clean array
-			slice.call( this );
+		// Return just the one element from the set 考虑到了负数的情况,也支持负数
+		return num < 0 ? this[ num + this.length ] : this[ num ];
 	},
 
 	// Take an array of elements and push it onto the stack
@@ -192,7 +193,7 @@ jQuery.fn = jQuery.prototype = {
 	splice: arr.splice
 };
 
-jQuery.extend = jQuery.fn.extend = function() {//jQuery深拷贝
+jQuery.extend = jQuery.fn.extend = function() {//jQuery深拷贝函数,2个参数的情况下直接浅拷贝
 	var options, name, src, copy, copyIsArray, clone,
 		target = arguments[ 0 ] || {},
 		i = 1,
@@ -200,21 +201,21 @@ jQuery.extend = jQuery.fn.extend = function() {//jQuery深拷贝
 		deep = false;
 
 	// Handle a deep copy situation
-	if ( typeof target === "boolean" ) {
+	if ( typeof target === "boolean" ) {//第一个参数如果是bool则赋值给deep决定是否深拷贝,target则为第二个参数
 		deep = target;
 
 		// Skip the boolean and the target
-		target = arguments[ i ] || {};
+		target = arguments[ i ] || {};// ||是经常用的，默认值或者不改变原有对象的情况
 		i++;
 	}
 
 	// Handle case when target is a string or something (possible in deep copy)
-	if ( typeof target !== "object" && !jQuery.isFunction( target ) ) {
+	if ( typeof target !== "object" && !jQuery.isFunction( target ) ) {//处理其他target输入的情况,转成对象
 		target = {};
 	}
 
-	// Extend jQuery itself if only one argument is passed只传一个参数extend本身
-	if ( i === length ) {
+	// Extend jQuery itself if only one argument is passed
+	if ( i === length ) {//相等是只传了一个参数的情况
 		target = this;
 		i--;
 	}
@@ -229,25 +230,25 @@ jQuery.extend = jQuery.fn.extend = function() {//jQuery深拷贝
 				src = target[ name ];
 				copy = options[ name ];
 
-				// Prevent never-ending loop
+				// Prevent never-ending loop ?不是很懂,target里面一个属性是它本身?
 				if ( target === copy ) {
-					continue;//这个可以多用
+					continue;
 				}
 
-				// Recurse if we're merging plain objects or arrays 递归
+				// Recurse if we're merging plain objects or arrays
 				if ( deep && copy && ( jQuery.isPlainObject( copy ) ||
 					( copyIsArray = jQuery.isArray( copy ) ) ) ) {
 
 					if ( copyIsArray ) {
 						copyIsArray = false;
-						clone = src && jQuery.isArray( src ) ? src : [];
+						clone = src && jQuery.isArray( src ) ? src : [];//把src转成数组
 
 					} else {
-						clone = src && jQuery.isPlainObject( src ) ? src : {};
+						clone = src && jQuery.isPlainObject( src ) ? src : {};//把src转成对象
 					}
 
 					// Never move original objects, clone them
-					target[ name ] = jQuery.extend( deep, clone, copy );
+					target[ name ] = jQuery.extend( deep, clone, copy );//数组和对象递归
 
 				// Don't bring in undefined values
 				} else if ( copy !== undefined ) {
@@ -299,7 +300,7 @@ jQuery.extend( {
 			!isNaN( obj - parseFloat( obj ) );
 	},
 
-	isPlainObject: function( obj ) {//没有prototype的对象或者原型constructor是function Object(){}的对象是plain object
+	isPlainObject: function( obj ) {// 纯粹的对象指的是 通过 "{}" 或者 "new Object" 创建的
 		var proto, Ctor;
 
 		// Detect obvious negatives
@@ -310,12 +311,12 @@ jQuery.extend( {
 
 		proto = getProto( obj );
 
-		// Objects with no prototype (e.g., `Object.create( null )`) are plain 原来如此
+		// Objects with no prototype (e.g., `Object.create( null )`) are plain 没有原型的是plain object
 		if ( !proto ) {
 			return true;
 		}
 
-		// Objects with prototype are plain iff they were constructed by a global Object function
+		// Objects with prototype are plain iff they were constructed by a global Object function 由Object函数构造出来的也是plain object
 		Ctor = hasOwn.call( proto, "constructor" ) && proto.constructor;
 		return typeof Ctor === "function" && fnToString.call( Ctor ) === ObjectFunctionString;
 	},
@@ -334,10 +335,10 @@ jQuery.extend( {
 
 	type: function( obj ) {
 		if ( obj == null ) {
-			return obj + "";
+			return obj + "";//返回"null"
 		}
 
-		// Support: Android <=2.3 only (functionish RegExp)
+		// Support: Android <=2.3 only (functionish RegExp) typeof [] 是"object"
 		return typeof obj === "object" || typeof obj === "function" ?
 			class2type[ toString.call( obj ) ] || "object" :
 			typeof obj;
@@ -352,14 +353,14 @@ jQuery.extend( {
 	// Support: IE <=9 - 11, Edge 12 - 13
 	// Microsoft forgot to hump their vendor prefix (#9572)
 	camelCase: function( string ) {
-		return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
+		return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );//把-ms-变成ms-再把-小写变成驼峰?
 	},
 
 	nodeName: function( elem, name ) {
 		return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
 	},
 
-	each: function( obj, callback ) {
+	each: function( obj, callback ) {//充分利用回调callback,数组用for循环,对象用for in
 		var length, i = 0;
 
 		if ( isArrayLike( obj ) ) {
@@ -411,16 +412,16 @@ jQuery.extend( {
 
 	// Support: Android <=4.0 only, PhantomJS 1 only
 	// push.apply(_, arraylike) throws on ancient WebKit
-	merge: function( first, second ) {
+	merge: function( first, second ) {//数组合并返回first数组 shallow merge
 		var len = +second.length,
 			j = 0,
-			i = first.length;
+			i = first.length;//jQuery对象有length属性
 
 		for ( ; j < len; j++ ) {
-			first[ i++ ] = second[ j ];
+			first[ i++ ] = second[ j ];//遍历second即可
 		}
 
-		first.length = i;
+		first.length = i;//更新length
 
 		return first;
 	},
@@ -528,10 +529,10 @@ function( i, name ) {
 function isArrayLike( obj ) {
 
 	// Support: real iOS 8.2 only (not reproducible in simulator)
-	// `in` check used to prevent JIT error (gh-2145)
-	// hasOwn isn't used here due to false negatives
+	// `in` check used to prevent JIT error (gh-2145)什么意思
+	// hasOwn isn't used here due to false negatives IE这里有坑啊
 	// regarding Nodelist length in IE
-	var length = !!obj && "length" in obj && obj.length,
+	var length = !!obj && "length" in obj && obj.length,//hasOwnProperty和in还是得用in吗?
 		type = jQuery.type( obj );
 
 	if ( type === "function" || jQuery.isWindow( obj ) ) {
@@ -543,14 +544,14 @@ function isArrayLike( obj ) {
 }
 var Sizzle =
 /*!
- * Sizzle CSS Selector Engine v2.3.0
+ * Sizzle CSS Selector Engine v2.3.3
  * https://sizzlejs.com/
  *
  * Copyright jQuery Foundation and other contributors
  * Released under the MIT license
  * http://jquery.org/license
  *
- * Date: 2016-01-04
+ * Date: 2016-08-08
  */
 (function( window ) {
 
@@ -696,7 +697,7 @@ var i,
 
 	// CSS string/identifier serialization
 	// https://drafts.csswg.org/cssom/#common-serializing-idioms
-	rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\x80-\uFFFF\w-]/g,
+	rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\0-\x1f\x7f-\uFFFF\w-]/g,
 	fcssescape = function( ch, asCodePoint ) {
 		if ( asCodePoint ) {
 
@@ -723,7 +724,7 @@ var i,
 
 	disabledAncestor = addCombinator(
 		function( elem ) {
-			return elem.disabled === true;
+			return elem.disabled === true && ("form" in elem || "label" in elem);
 		},
 		{ dir: "parentNode", next: "legend" }
 	);
@@ -774,7 +775,7 @@ function Sizzle( selector, context, results, seed ) {
 	}
 
 	// Try to shortcut find operations (as opposed to filters) in HTML documents
-	if ( !seed ) {
+	if ( !seed ) {//seed是什么?
 
 		if ( ( context ? context.ownerDocument || context : preferredDoc ) !== document ) {
 			setDocument( context );
@@ -1009,26 +1010,54 @@ function createButtonPseudo( type ) {
  * @param {Boolean} disabled true for :disabled; false for :enabled
  */
 function createDisabledPseudo( disabled ) {
-	// Known :disabled false positives:
-	// IE: *[disabled]:not(button, input, select, textarea, optgroup, option, menuitem, fieldset)
-	// not IE: fieldset[disabled] > legend:nth-of-type(n+2) :can-disable
+
+	// Known :disabled false positives: fieldset[disabled] > legend:nth-of-type(n+2) :can-disable
 	return function( elem ) {
 
-		// Check form elements and option elements for explicit disabling
-		return "label" in elem && elem.disabled === disabled ||
-			"form" in elem && elem.disabled === disabled ||
+		// Only certain elements can match :enabled or :disabled
+		// https://html.spec.whatwg.org/multipage/scripting.html#selector-enabled
+		// https://html.spec.whatwg.org/multipage/scripting.html#selector-disabled
+		if ( "form" in elem ) {
 
-			// Check non-disabled form elements for fieldset[disabled] ancestors
-			"form" in elem && elem.disabled === false && (
-				// Support: IE6-11+
-				// Ancestry is covered for us
-				elem.isDisabled === disabled ||
+			// Check for inherited disabledness on relevant non-disabled elements:
+			// * listed form-associated elements in a disabled fieldset
+			//   https://html.spec.whatwg.org/multipage/forms.html#category-listed
+			//   https://html.spec.whatwg.org/multipage/forms.html#concept-fe-disabled
+			// * option elements in a disabled optgroup
+			//   https://html.spec.whatwg.org/multipage/forms.html#concept-option-disabled
+			// All such elements have a "form" property.
+			if ( elem.parentNode && elem.disabled === false ) {
 
-				// Otherwise, assume any non-<option> under fieldset[disabled] is disabled
-				/* jshint -W018 */
-				elem.isDisabled !== !disabled &&
-					("label" in elem || !disabledAncestor( elem )) !== disabled
-			);
+				// Option elements defer to a parent optgroup if present
+				if ( "label" in elem ) {
+					if ( "label" in elem.parentNode ) {
+						return elem.parentNode.disabled === disabled;
+					} else {
+						return elem.disabled === disabled;
+					}
+				}
+
+				// Support: IE 6 - 11
+				// Use the isDisabled shortcut property to check for disabled fieldset ancestors
+				return elem.isDisabled === disabled ||
+
+					// Where there is no isDisabled, check manually
+					/* jshint -W018 */
+					elem.isDisabled !== !disabled &&
+						disabledAncestor( elem ) === disabled;
+			}
+
+			return elem.disabled === disabled;
+
+		// Try to winnow out elements that can't be disabled before trusting the disabled property.
+		// Some victims get caught in our net (label, legend, menu, track), but it shouldn't
+		// even exist on them, let alone have a boolean value.
+		} else if ( "label" in elem ) {
+			return elem.disabled === disabled;
+		}
+
+		// Remaining elements are neither :enabled nor :disabled
+		return false;
 	};
 }
 
@@ -1094,7 +1123,7 @@ setDocument = Sizzle.setDocument = function( node ) {
 
 	// Update global variables
 	document = doc;
-	docElem = document.documentElement;
+	docElem = document.documentElement;//html document
 	documentIsHTML = !isXML( document );
 
 	// Support: IE 9-11, Edge
@@ -1144,25 +1173,21 @@ setDocument = Sizzle.setDocument = function( node ) {
 		return !document.getElementsByName || !document.getElementsByName( expando ).length;
 	});
 
-	// ID find and filter
+	// ID filter and find
 	if ( support.getById ) {
-		Expr.find["ID"] = function( id, context ) {
-			if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
-				var m = context.getElementById( id );
-				return m ? [ m ] : [];
-			}
-		};
 		Expr.filter["ID"] = function( id ) {
 			var attrId = id.replace( runescape, funescape );
 			return function( elem ) {
 				return elem.getAttribute("id") === attrId;
 			};
 		};
+		Expr.find["ID"] = function( id, context ) {
+			if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
+				var elem = context.getElementById( id );
+				return elem ? [ elem ] : [];
+			}
+		};
 	} else {
-		// Support: IE6/7
-		// getElementById is not reliable as a find shortcut
-		delete Expr.find["ID"];
-
 		Expr.filter["ID"] =  function( id ) {
 			var attrId = id.replace( runescape, funescape );
 			return function( elem ) {
@@ -1170,6 +1195,36 @@ setDocument = Sizzle.setDocument = function( node ) {
 					elem.getAttributeNode("id");
 				return node && node.value === attrId;
 			};
+		};
+
+		// Support: IE 6 - 7 only
+		// getElementById is not reliable as a find shortcut
+		Expr.find["ID"] = function( id, context ) {
+			if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
+				var node, i, elems,
+					elem = context.getElementById( id );
+
+				if ( elem ) {
+
+					// Verify the id attribute
+					node = elem.getAttributeNode("id");
+					if ( node && node.value === id ) {
+						return [ elem ];
+					}
+
+					// Fall back on getElementsByName
+					elems = context.getElementsByName( id );
+					i = 0;
+					while ( (elem = elems[i++]) ) {
+						node = elem.getAttributeNode("id");
+						if ( node && node.value === id ) {
+							return [ elem ];
+						}
+					}
+				}
+
+				return [];
+			}
 		};
 	}
 
@@ -2211,6 +2266,7 @@ function addCombinator( matcher, combinator, base ) {
 					return matcher( elem, context, xml );
 				}
 			}
+			return false;
 		} :
 
 		// Check against all ancestor/preceding elements
@@ -2255,6 +2311,7 @@ function addCombinator( matcher, combinator, base ) {
 					}
 				}
 			}
+			return false;
 		};
 }
 
@@ -2617,8 +2674,7 @@ select = Sizzle.select = function( selector, context, results, seed ) {
 		// Reduce context if the leading compound selector is an ID
 		tokens = match[0] = match[0].slice( 0 );
 		if ( tokens.length > 2 && (token = tokens[0]).type === "ID" &&
-				support.getById && context.nodeType === 9 && documentIsHTML &&
-				Expr.relative[ tokens[1].type ] ) {
+				context.nodeType === 9 && documentIsHTML && Expr.relative[ tokens[1].type ] ) {
 
 			context = ( Expr.find["ID"]( token.matches[0].replace(runescape, funescape), context ) || [] )[0];
 			if ( !context ) {
@@ -2788,7 +2844,7 @@ var siblings = function( n, elem ) {
 
 var rneedsContext = jQuery.expr.match.needsContext;
 
-var rsingleTag = ( /^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|)$/i );
+var rsingleTag = ( /^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|)$/i );//以前的rsingleTag = /^<(\w+)\s*\/?>(?:<\/\1>|)$/  捕获到不带属性的html标签第一个?表示捕获0或1次像<img />这种带斜杠的 后面的\1表示最近的第一个捕获组 /^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|)$/i
 
 
 
@@ -2800,24 +2856,29 @@ function winnow( elements, qualifier, not ) {
 		return jQuery.grep( elements, function( elem, i ) {
 			return !!qualifier.call( elem, i, elem ) !== not;
 		} );
-
 	}
 
+	// Single element
 	if ( qualifier.nodeType ) {
 		return jQuery.grep( elements, function( elem ) {
 			return ( elem === qualifier ) !== not;
 		} );
-
 	}
 
-	if ( typeof qualifier === "string" ) {
-		if ( risSimple.test( qualifier ) ) {
-			return jQuery.filter( qualifier, elements, not );
-		}
-
-		qualifier = jQuery.filter( qualifier, elements );
+	// Arraylike of elements (jQuery, arguments, Array)
+	if ( typeof qualifier !== "string" ) {
+		return jQuery.grep( elements, function( elem ) {
+			return ( indexOf.call( qualifier, elem ) > -1 ) !== not;
+		} );
 	}
 
+	// Simple selector that can be filtered directly, removing non-Elements
+	if ( risSimple.test( qualifier ) ) {
+		return jQuery.filter( qualifier, elements, not );
+	}
+
+	// Complex selector, compare the two sets, removing non-Elements
+	qualifier = jQuery.filter( qualifier, elements );
 	return jQuery.grep( elements, function( elem ) {
 		return ( indexOf.call( qualifier, elem ) > -1 ) !== not && elem.nodeType === 1;
 	} );
@@ -2830,11 +2891,13 @@ jQuery.filter = function( expr, elems, not ) {
 		expr = ":not(" + expr + ")";
 	}
 
-	return elems.length === 1 && elem.nodeType === 1 ?
-		jQuery.find.matchesSelector( elem, expr ) ? [ elem ] : [] :
-		jQuery.find.matches( expr, jQuery.grep( elems, function( elem ) {
-			return elem.nodeType === 1;
-		} ) );
+	if ( elems.length === 1 && elem.nodeType === 1 ) {
+		return jQuery.find.matchesSelector( elem, expr ) ? [ elem ] : [];
+	}
+
+	return jQuery.find.matches( expr, jQuery.grep( elems, function( elem ) {
+		return elem.nodeType === 1;
+	} ) );
 };
 
 jQuery.fn.extend( {
@@ -2856,7 +2919,7 @@ jQuery.fn.extend( {
 		ret = this.pushStack( [] );
 
 		for ( i = 0; i < len; i++ ) {
-			jQuery.find( selector, self[ i ], ret );
+			jQuery.find( selector, self[ i ], ret );//调用Sizzle这个是怎么调用的?
 		}
 
 		return len > 1 ? jQuery.uniqueSort( ret ) : ret;
@@ -2892,7 +2955,7 @@ var rootjQuery,
 	// Prioritize #id over <tag> to avoid XSS via location.hash (#9521)
 	// Strict HTML recognition (#11290: must start with <)
 	// Shortcut simple #id case for speed
-	rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]+))$/,
+	rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]+))$/, //非捕获组 空格多个 捕获<小w是[a-zA-Z0-9_]大W与其相反[^A-Za-z0-9_]多个> 非>多个  或者匹配以 # 捕获组w-多个 结束  ？？
 
 	init = jQuery.fn.init = function( selector, context, root ) {
 		var match, elem;
@@ -2907,7 +2970,7 @@ var rootjQuery,
 		root = root || rootjQuery;
 
 		// Handle HTML strings
-		if ( typeof selector === "string" ) {
+		if ( typeof selector === "string" ) {//处理选择器是 <div> 的情况
 			if ( selector[ 0 ] === "<" &&
 				selector[ selector.length - 1 ] === ">" &&
 				selector.length >= 3 ) {
@@ -2966,7 +3029,7 @@ var rootjQuery,
 
 			// HANDLE: $(expr, $(...))
 			} else if ( !context || context.jquery ) {
-				return ( context || root ).find( selector );
+				return ( context || root ).find( selector );//调用find查找
 
 			// HANDLE: $(expr, context)
 			// (which is just equivalent to: $(context).find(expr)
@@ -2994,7 +3057,7 @@ var rootjQuery,
 	};
 
 // Give the init function the jQuery prototype for later instantiation
-init.prototype = jQuery.fn;
+init.prototype = jQuery.fn;//这样做的意义是通过init构造出来的对象能访问jQuery的方法
 
 // Initialize central reference
 rootjQuery = jQuery( document );
@@ -3162,14 +3225,14 @@ jQuery.each( {
 		return this.pushStack( matched );
 	};
 } );
-var rnotwhite = ( /\S+/g );
+var rnothtmlwhite = ( /[^\x20\t\r\n\f]+/g );//匹配[]里不是下列的字符16进制20(空格) \t\r\n\f多次,全局g的意思是不会在第一次匹配成功后返回
 
 
 
 // Convert String-formatted options into Object-formatted ones
 function createOptions( options ) {
 	var object = {};
-	jQuery.each( options.match( rnotwhite ) || [], function( _, flag ) {
+	jQuery.each( options.match( rnothtmlwhite ) || [], function( _, flag ) {//匹配到字符串后对匹配到的字符串数组进行each遍历并将其作为返回对象的key val为true
 		object[ flag ] = true;
 	} );
 	return object;
@@ -3186,7 +3249,7 @@ function createOptions( options ) {
  *
  * Possible options:
  *
- *	once:			will ensure the callback list can only be fired once (like a Deferred)
+ *	once:			will ensure the callback list can only be fired once (like a Deferred) Deferred callback只能触发一次?
  *
  *	memory:			will keep track of previous values and will call any callback added
  *					after the list has been fired right away with the latest "memorized"
@@ -3230,18 +3293,18 @@ jQuery.Callbacks = function( options ) {
 		fire = function() {
 
 			// Enforce single-firing
-			locked = options.once;
+			locked = options.once;//只一次
 
 			// Execute callbacks for all pending executions,
 			// respecting firingIndex overrides and runtime changes
 			fired = firing = true;
 			for ( ; queue.length; firingIndex = -1 ) {
-				memory = queue.shift();
+				memory = queue.shift();//queue中的东西放入memory
 				while ( ++firingIndex < list.length ) {
 
 					// Run callback and check for early termination
 					if ( list[ firingIndex ].apply( memory[ 0 ], memory[ 1 ] ) === false &&
-						options.stopOnFalse ) {
+						options.stopOnFalse ) {//第一个是list.add
 
 						// Jump to end and forget the data so .add doesn't re-fire
 						firingIndex = list.length;
@@ -3293,7 +3356,7 @@ jQuery.Callbacks = function( options ) {
 							} else if ( arg && arg.length && jQuery.type( arg ) !== "string" ) {
 
 								// Inspect recursively
-								add( arg );
+								add( arg );//递归增加函数
 							}
 						} );
 					} )( arguments );
@@ -3367,8 +3430,8 @@ jQuery.Callbacks = function( options ) {
 			fireWith: function( context, args ) {
 				if ( !locked ) {
 					args = args || [];
-					args = [ context, args.slice ? args.slice() : args ];
-					queue.push( args );
+					args = [ context, args.slice ? args.slice() : args ];//判断其是否是数组
+					queue.push( args );//queue中传入一个第一个元素是context和args的
 					if ( !firing ) {
 						fire();
 					}
@@ -3379,7 +3442,7 @@ jQuery.Callbacks = function( options ) {
 			// Call all the callbacks with the given arguments
 			fire: function() {
 				self.fireWith( this, arguments );
-				return this;
+				return this;//这个应该是为了链式调用
 			},
 
 			// To know if the callbacks have already been called at least once
@@ -3437,7 +3500,7 @@ jQuery.extend( {
 		var tuples = [
 
 				// action, add listener, callbacks,
-				// ... .then handlers, argument index, [final state]
+				// ... .then handlers, argument index, [final state] 什么意思？
 				[ "notify", "progress", jQuery.Callbacks( "memory" ),
 					jQuery.Callbacks( "memory" ), 2 ],
 				[ "resolve", "done", jQuery.Callbacks( "once memory" ),
@@ -3445,8 +3508,8 @@ jQuery.extend( {
 				[ "reject", "fail", jQuery.Callbacks( "once memory" ),
 					jQuery.Callbacks( "once memory" ), 1, "rejected" ]
 			],
-			state = "pending",
-			promise = {
+			state = "pending",//初始为挂起状态
+			promise = {//像这种函数内部声明的变量可以利用闭包来访问(接口interface)
 				state: function() {
 					return state;
 				},
@@ -3489,7 +3552,7 @@ jQuery.extend( {
 						fns = null;
 					} ).promise();
 				},
-				then: function( onFulfilled, onRejected, onProgress ) {
+				then: function( onFulfilled, onRejected, onProgress ) {//fire是怎么跳到这里来的?
 					var maxDepth = 0;
 					function resolve( depth, deferred, handler, special ) {
 						return function() {
@@ -3656,7 +3719,7 @@ jQuery.extend( {
 
 				// Get a promise for this deferred
 				// If obj is provided, the promise aspect is added to the object
-				promise: function( obj ) {
+				promise: function( obj ) {//将promise的东西合并到defered对象
 					return obj != null ? jQuery.extend( obj, promise ) : promise;
 				}
 			},
@@ -3673,13 +3736,13 @@ jQuery.extend( {
 			promise[ tuple[ 1 ] ] = list.add;
 
 			// Handle state
-			if ( stateString ) {
+			if ( stateString ) {//这个应该是判断ajax是否处于完成状态,progress进行中状态
 				list.add(
 					function() {
 
 						// state = "resolved" (i.e., fulfilled)
 						// state = "rejected"
-						state = stateString;
+						state = stateString;//ajax成功之后进到这里
 					},
 
 					// rejected_callbacks.disable
@@ -3696,7 +3759,7 @@ jQuery.extend( {
 			// rejected_handlers.fire
 			list.add( tuple[ 3 ].fire );
 
-			// deferred.notify = function() { deferred.notifyWith(...) }
+			// deferred.notify = function() { deferred.notifyWith(...) }什么意思?
 			// deferred.resolve = function() { deferred.resolveWith(...) }
 			// deferred.reject = function() { deferred.rejectWith(...) }
 			deferred[ tuple[ 0 ] ] = function() {
@@ -3704,13 +3767,13 @@ jQuery.extend( {
 				return this;
 			};
 
-			// deferred.notifyWith = list.fireWith
+			// deferred.notifyWith = list.fireWith ??
 			// deferred.resolveWith = list.fireWith
 			// deferred.rejectWith = list.fireWith
 			deferred[ tuple[ 0 ] + "With" ] = list.fireWith;
 		} );
 
-		// Make the deferred a promise
+		// Make the deferred a promise 扩展defered对象
 		promise.promise( deferred );
 
 		// Call given func if any
@@ -3834,7 +3897,7 @@ jQuery.extend( {
 	},
 
 	// Handle when the DOM is ready
-	ready: function( wait ) {
+	ready: function( wait ) {//jq ready function
 
 		// Abort if there are pending holds or we're already ready
 		if ( wait === true ? --jQuery.readyWait : jQuery.isReady ) {
@@ -3850,16 +3913,16 @@ jQuery.extend( {
 		}
 
 		// If there are functions bound, to execute
-		readyList.resolveWith( document, [ jQuery ] );
+		readyList.resolveWith( document, [ jQuery ] );//这边跳到ajax的fireWith函数里面去了
 	}
 } );
 
 jQuery.ready.then = readyList.then;
 
 // The ready event handler and self cleanup method
-function completed() {
+function completed() {//这个应该是jq的ready function. ajax走完之后进入这里了，应该是页面加载完了
 	document.removeEventListener( "DOMContentLoaded", completed );
-	window.removeEventListener( "load", completed );
+	window.removeEventListener( "load", completed );//内存释放很重要
 	jQuery.ready();
 }
 
@@ -3934,13 +3997,16 @@ var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
 		}
 	}
 
-	return chainable ?
-		elems :
+	if ( chainable ) {
+		return elems;
+	}
 
-		// Gets
-		bulk ?
-			fn.call( elems ) :
-			len ? fn( elems[ 0 ], key ) : emptyGet;
+	// Gets
+	if ( bulk ) {
+		return fn.call( elems );
+	}
+
+	return len ? fn( elems[ 0 ], key ) : emptyGet;
 };
 var acceptData = function( owner ) {
 
@@ -4077,7 +4143,7 @@ Data.prototype = {
 				// Otherwise, create an array by matching non-whitespace
 				key = key in cache ?
 					[ key ] :
-					( key.match( rnotwhite ) || [] );
+					( key.match( rnothtmlwhite ) || [] );
 			}
 
 			i = key.length;
@@ -4125,6 +4191,31 @@ var dataUser = new Data();
 var rbrace = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,
 	rmultiDash = /[A-Z]/g;
 
+function getData( data ) {
+	if ( data === "true" ) {
+		return true;
+	}
+
+	if ( data === "false" ) {
+		return false;
+	}
+
+	if ( data === "null" ) {
+		return null;
+	}
+
+	// Only convert to a number if it doesn't change the string
+	if ( data === +data + "" ) {
+		return +data;
+	}
+
+	if ( rbrace.test( data ) ) {
+		return JSON.parse( data );
+	}
+
+	return data;
+}
+
 function dataAttr( elem, key, data ) {
 	var name;
 
@@ -4136,14 +4227,7 @@ function dataAttr( elem, key, data ) {
 
 		if ( typeof data === "string" ) {
 			try {
-				data = data === "true" ? true :
-					data === "false" ? false :
-					data === "null" ? null :
-
-					// Only convert to a number if it doesn't change the string
-					+data + "" === data ? +data :
-					rbrace.test( data ) ? JSON.parse( data ) :
-					data;
+				data = getData( data );
 			} catch ( e ) {}
 
 			// Make sure we set the data so it isn't changed later
@@ -4520,7 +4604,7 @@ function getDefaultDisplay( elem ) {
 		return display;
 	}
 
-	temp = doc.body.appendChild( doc.createElement( nodeName ) ),
+	temp = doc.body.appendChild( doc.createElement( nodeName ) );
 	display = jQuery.css( temp, "display" );
 
 	temp.parentNode.removeChild( temp );
@@ -4638,15 +4722,23 @@ function getAll( context, tag ) {
 
 	// Support: IE <=9 - 11 only
 	// Use typeof to avoid zero-argument method invocation on host objects (#15151)
-	var ret = typeof context.getElementsByTagName !== "undefined" ?
-			context.getElementsByTagName( tag || "*" ) :
-			typeof context.querySelectorAll !== "undefined" ?
-				context.querySelectorAll( tag || "*" ) :
-			[];
+	var ret;
 
-	return tag === undefined || tag && jQuery.nodeName( context, tag ) ?
-		jQuery.merge( [ context ], ret ) :
-		ret;
+	if ( typeof context.getElementsByTagName !== "undefined" ) {
+		ret = context.getElementsByTagName( tag || "*" );
+
+	} else if ( typeof context.querySelectorAll !== "undefined" ) {
+		ret = context.querySelectorAll( tag || "*" );
+
+	} else {
+		ret = [];
+	}
+
+	if ( tag === undefined || tag && jQuery.nodeName( context, tag ) ) {
+		return jQuery.merge( [ context ], ret );
+	}
+
+	return ret;
 }
 
 
@@ -4869,7 +4961,7 @@ function on( elem, types, selector, data, fn, one ) {
 
 /*
  * Helper functions for managing events -- not part of the public interface.
- * Props to Dean Edwards' addEvent library for many of the ideas.
+ * Props to Dean Edwards' addEvent library for many of the ideas.必看!
  */
 jQuery.event = {
 
@@ -4920,7 +5012,7 @@ jQuery.event = {
 		}
 
 		// Handle multiple events separated by a space
-		types = ( types || "" ).match( rnotwhite ) || [ "" ];
+		types = ( types || "" ).match( rnothtmlwhite ) || [ "" ];
 		t = types.length;
 		while ( t-- ) {
 			tmp = rtypenamespace.exec( types[ t ] ) || [];
@@ -5002,7 +5094,7 @@ jQuery.event = {
 		}
 
 		// Once for each type.namespace in types; type may be omitted
-		types = ( types || "" ).match( rnotwhite ) || [ "" ];
+		types = ( types || "" ).match( rnothtmlwhite ) || [ "" ];
 		t = types.length;
 		while ( t-- ) {
 			tmp = rtypenamespace.exec( types[ t ] ) || [];
@@ -5128,51 +5220,58 @@ jQuery.event = {
 	},
 
 	handlers: function( event, handlers ) {
-		var i, matches, sel, handleObj,
+		var i, handleObj, sel, matchedHandlers, matchedSelectors,
 			handlerQueue = [],
 			delegateCount = handlers.delegateCount,
 			cur = event.target;
 
-		// Support: IE <=9
 		// Find delegate handlers
-		// Black-hole SVG <use> instance trees (#13180)
-		//
-		// Support: Firefox <=42
-		// Avoid non-left-click in FF but don't block IE radio events (#3861, gh-2343)
-		if ( delegateCount && cur.nodeType &&
-			( event.type !== "click" || isNaN( event.button ) || event.button < 1 ) ) {
+		if ( delegateCount &&
+
+			// Support: IE <=9
+			// Black-hole SVG <use> instance trees (trac-13180)
+			cur.nodeType &&
+
+			// Support: Firefox <=42
+			// Suppress spec-violating clicks indicating a non-primary pointer button (trac-3861)
+			// https://www.w3.org/TR/DOM-Level-3-Events/#event-type-click
+			// Support: IE 11 only
+			// ...but not arrow key "clicks" of radio inputs, which can have `button` -1 (gh-2343)
+			!( event.type === "click" && event.button >= 1 ) ) {
 
 			for ( ; cur !== this; cur = cur.parentNode || this ) {
 
 				// Don't check non-elements (#13208)
 				// Don't process clicks on disabled elements (#6911, #8165, #11382, #11764)
-				if ( cur.nodeType === 1 && ( cur.disabled !== true || event.type !== "click" ) ) {
-					matches = [];
+				if ( cur.nodeType === 1 && !( event.type === "click" && cur.disabled === true ) ) {
+					matchedHandlers = [];
+					matchedSelectors = {};
 					for ( i = 0; i < delegateCount; i++ ) {
 						handleObj = handlers[ i ];
 
 						// Don't conflict with Object.prototype properties (#13203)
 						sel = handleObj.selector + " ";
 
-						if ( matches[ sel ] === undefined ) {
-							matches[ sel ] = handleObj.needsContext ?
+						if ( matchedSelectors[ sel ] === undefined ) {
+							matchedSelectors[ sel ] = handleObj.needsContext ?
 								jQuery( sel, this ).index( cur ) > -1 :
 								jQuery.find( sel, this, null, [ cur ] ).length;
 						}
-						if ( matches[ sel ] ) {
-							matches.push( handleObj );
+						if ( matchedSelectors[ sel ] ) {
+							matchedHandlers.push( handleObj );
 						}
 					}
-					if ( matches.length ) {
-						handlerQueue.push( { elem: cur, handlers: matches } );
+					if ( matchedHandlers.length ) {
+						handlerQueue.push( { elem: cur, handlers: matchedHandlers } );
 					}
 				}
 			}
 		}
 
 		// Add the remaining (directly-bound) handlers
+		cur = this;
 		if ( delegateCount < handlers.length ) {
-			handlerQueue.push( { elem: this, handlers: handlers.slice( delegateCount ) } );
+			handlerQueue.push( { elem: cur, handlers: handlers.slice( delegateCount ) } );
 		}
 
 		return handlerQueue;
@@ -5275,7 +5374,7 @@ jQuery.removeEvent = function( elem, type, handle ) {
 	}
 };
 
-jQuery.Event = function( src, props ) {
+jQuery.Event = function( src, props ) {//新建一个事件ajaxSend
 
 	// Allow instantiation without the 'new' keyword
 	if ( !( this instanceof jQuery.Event ) ) {
@@ -5406,7 +5505,19 @@ jQuery.each( {
 
 		// Add which for click: 1 === left; 2 === middle; 3 === right
 		if ( !event.which && button !== undefined && rmouseEvent.test( event.type ) ) {
-			return ( button & 1 ? 1 : ( button & 2 ? 3 : ( button & 4 ? 2 : 0 ) ) );
+			if ( button & 1 ) {
+				return 1;
+			}
+
+			if ( button & 2 ) {
+				return 3;
+			}
+
+			if ( button & 4 ) {
+				return 2;
+			}
+
+			return 0;
 		}
 
 		return event.which;
@@ -6162,15 +6273,17 @@ function setPositiveNumber( elem, value, subtract ) {
 }
 
 function augmentWidthOrHeight( elem, name, extra, isBorderBox, styles ) {
-	var i = extra === ( isBorderBox ? "border" : "content" ) ?
-
-		// If we already have the right measurement, avoid augmentation
-		4 :
-
-		// Otherwise initialize for horizontal or vertical properties
-		name === "width" ? 1 : 0,
-
+	var i,
 		val = 0;
+
+	// If we already have the right measurement, avoid augmentation
+	if ( extra === ( isBorderBox ? "border" : "content" ) ) {
+		i = 4;
+
+	// Otherwise initialize for horizontal or vertical properties
+	} else {
+		i = name === "width" ? 1 : 0;
+	}
 
 	for ( ; i < 4; i += 2 ) {
 
@@ -7024,7 +7137,7 @@ jQuery.Animation = jQuery.extend( Animation, {
 			callback = props;
 			props = [ "*" ];
 		} else {
-			props = props.match( rnotwhite );
+			props = props.match( rnothtmlwhite );
 		}
 
 		var prop,
@@ -7062,9 +7175,14 @@ jQuery.speed = function( speed, easing, fn ) {
 		opt.duration = 0;
 
 	} else {
-		opt.duration = typeof opt.duration === "number" ?
-			opt.duration : opt.duration in jQuery.fx.speeds ?
-				jQuery.fx.speeds[ opt.duration ] : jQuery.fx.speeds._default;
+		if ( typeof opt.duration !== "number" ) {
+			if ( opt.duration in jQuery.fx.speeds ) {
+				opt.duration = jQuery.fx.speeds[ opt.duration ];
+
+			} else {
+				opt.duration = jQuery.fx.speeds._default;
+			}
+		}
 	}
 
 	// Normalize opt.queue - true/undefined/null -> "fx"
@@ -7414,7 +7532,10 @@ jQuery.extend( {
 	removeAttr: function( elem, value ) {
 		var name,
 			i = 0,
-			attrNames = value && value.match( rnotwhite );
+
+			// Attribute names can contain non-HTML whitespace characters
+			// https://html.spec.whatwg.org/multipage/syntax.html#attributes-2
+			attrNames = value && value.match( rnothtmlwhite );
 
 		if ( attrNames && elem.nodeType === 1 ) {
 			while ( ( name = attrNames[ i++ ] ) ) {
@@ -7521,12 +7642,19 @@ jQuery.extend( {
 				// Use proper attribute retrieval(#12072)
 				var tabindex = jQuery.find.attr( elem, "tabindex" );
 
-				return tabindex ?
-					parseInt( tabindex, 10 ) :
+				if ( tabindex ) {
+					return parseInt( tabindex, 10 );
+				}
+
+				if (
 					rfocusable.test( elem.nodeName ) ||
-						rclickable.test( elem.nodeName ) && elem.href ?
-							0 :
-							-1;
+					rclickable.test( elem.nodeName ) &&
+					elem.href
+				) {
+					return 0;
+				}
+
+				return -1;
 			}
 		}
 	},
@@ -7543,9 +7671,14 @@ jQuery.extend( {
 // on the option
 // The getter ensures a default option is selected
 // when in an optgroup
+// eslint rule "no-unused-expressions" is disabled for this code
+// since it considers such accessions noop
 if ( !support.optSelected ) {
 	jQuery.propHooks.selected = {
 		get: function( elem ) {
+
+			/* eslint no-unused-expressions: "off" */
+
 			var parent = elem.parentNode;
 			if ( parent && parent.parentNode ) {
 				parent.parentNode.selectedIndex;
@@ -7553,6 +7686,9 @@ if ( !support.optSelected ) {
 			return null;
 		},
 		set: function( elem ) {
+
+			/* eslint no-unused-expressions: "off" */
+
 			var parent = elem.parentNode;
 			if ( parent ) {
 				parent.selectedIndex;
@@ -7583,7 +7719,13 @@ jQuery.each( [
 
 
 
-var rclass = /[\t\r\n\f]/g;
+	// Strip and collapse whitespace according to HTML spec
+	// https://html.spec.whatwg.org/multipage/infrastructure.html#strip-and-collapse-whitespace
+	function stripAndCollapse( value ) {
+		var tokens = value.match( rnothtmlwhite ) || [];
+		return tokens.join( " " );
+	}
+
 
 function getClass( elem ) {
 	return elem.getAttribute && elem.getAttribute( "class" ) || "";
@@ -7601,12 +7743,11 @@ jQuery.fn.extend( {
 		}
 
 		if ( typeof value === "string" && value ) {
-			classes = value.match( rnotwhite ) || [];
+			classes = value.match( rnothtmlwhite ) || [];
 
 			while ( ( elem = this[ i++ ] ) ) {
 				curValue = getClass( elem );
-				cur = elem.nodeType === 1 &&
-					( " " + curValue + " " ).replace( rclass, " " );
+				cur = elem.nodeType === 1 && ( " " + stripAndCollapse( curValue ) + " " );
 
 				if ( cur ) {
 					j = 0;
@@ -7617,7 +7758,7 @@ jQuery.fn.extend( {
 					}
 
 					// Only assign if different to avoid unneeded rendering.
-					finalValue = jQuery.trim( cur );
+					finalValue = stripAndCollapse( cur );
 					if ( curValue !== finalValue ) {
 						elem.setAttribute( "class", finalValue );
 					}
@@ -7643,14 +7784,13 @@ jQuery.fn.extend( {
 		}
 
 		if ( typeof value === "string" && value ) {
-			classes = value.match( rnotwhite ) || [];
+			classes = value.match( rnothtmlwhite ) || [];
 
 			while ( ( elem = this[ i++ ] ) ) {
 				curValue = getClass( elem );
 
 				// This expression is here for better compressibility (see addClass)
-				cur = elem.nodeType === 1 &&
-					( " " + curValue + " " ).replace( rclass, " " );
+				cur = elem.nodeType === 1 && ( " " + stripAndCollapse( curValue ) + " " );
 
 				if ( cur ) {
 					j = 0;
@@ -7663,7 +7803,7 @@ jQuery.fn.extend( {
 					}
 
 					// Only assign if different to avoid unneeded rendering.
-					finalValue = jQuery.trim( cur );
+					finalValue = stripAndCollapse( cur );
 					if ( curValue !== finalValue ) {
 						elem.setAttribute( "class", finalValue );
 					}
@@ -7698,7 +7838,7 @@ jQuery.fn.extend( {
 				// Toggle individual class names
 				i = 0;
 				self = jQuery( this );
-				classNames = value.match( rnotwhite ) || [];
+				classNames = value.match( rnothtmlwhite ) || [];
 
 				while ( ( className = classNames[ i++ ] ) ) {
 
@@ -7741,10 +7881,8 @@ jQuery.fn.extend( {
 		className = " " + selector + " ";
 		while ( ( elem = this[ i++ ] ) ) {
 			if ( elem.nodeType === 1 &&
-				( " " + getClass( elem ) + " " ).replace( rclass, " " )
-					.indexOf( className ) > -1
-			) {
-				return true;
+				( " " + stripAndCollapse( getClass( elem ) ) + " " ).indexOf( className ) > -1 ) {
+					return true;
 			}
 		}
 
@@ -7755,8 +7893,7 @@ jQuery.fn.extend( {
 
 
 
-var rreturn = /\r/g,
-	rspaces = /[\x20\t\r\n\f]+/g;
+var rreturn = /\r/g;
 
 jQuery.fn.extend( {
 	val: function( value ) {
@@ -7777,13 +7914,13 @@ jQuery.fn.extend( {
 
 				ret = elem.value;
 
-				return typeof ret === "string" ?
+				// Handle most common string cases
+				if ( typeof ret === "string" ) {
+					return ret.replace( rreturn, "" );
+				}
 
-					// Handle most common string cases
-					ret.replace( rreturn, "" ) :
-
-					// Handle cases where value is null/undef or number
-					ret == null ? "" : ret;
+				// Handle cases where value is null/undef or number
+				return ret == null ? "" : ret;
 			}
 
 			return;
@@ -7840,20 +7977,24 @@ jQuery.extend( {
 					// option.text throws exceptions (#14686, #14858)
 					// Strip and collapse whitespace
 					// https://html.spec.whatwg.org/#strip-and-collapse-whitespace
-					jQuery.trim( jQuery.text( elem ) ).replace( rspaces, " " );
+					stripAndCollapse( jQuery.text( elem ) );
 			}
 		},
 		select: {
 			get: function( elem ) {
-				var value, option,
+				var value, option, i,
 					options = elem.options,
 					index = elem.selectedIndex,
 					one = elem.type === "select-one",
 					values = one ? null : [],
-					max = one ? index + 1 : options.length,
-					i = index < 0 ?
-						max :
-						one ? index : 0;
+					max = one ? index + 1 : options.length;
+
+				if ( index < 0 ) {
+					i = max;
+
+				} else {
+					i = one ? index : 0;
+				}
 
 				// Loop through all the selected options
 				for ( ; i < max; i++ ) {
@@ -7938,7 +8079,7 @@ jQuery.each( [ "radio", "checkbox" ], function() {
 
 var rfocusMorph = /^(?:focusinfocus|focusoutblur)$/;
 
-jQuery.extend( jQuery.event, {
+jQuery.extend( jQuery.event, {//扩展jQuery.event
 
 	trigger: function( event, data, elem, onlyHandlers ) {
 
@@ -7950,7 +8091,7 @@ jQuery.extend( jQuery.event, {
 		cur = tmp = elem = elem || document;
 
 		// Don't do events on text and comment nodes
-		if ( elem.nodeType === 3 || elem.nodeType === 8 ) {
+		if ( elem.nodeType === 3 || elem.nodeType === 8 ) {//text和comment nodes
 			return;
 		}
 
@@ -8307,13 +8448,17 @@ jQuery.fn.extend( {
 		.map( function( i, elem ) {
 			var val = jQuery( this ).val();
 
-			return val == null ?
-				null :
-				jQuery.isArray( val ) ?
-					jQuery.map( val, function( val ) {
-						return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
-					} ) :
-					{ name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+			if ( val == null ) {
+				return null;
+			}
+
+			if ( jQuery.isArray( val ) ) {
+				return jQuery.map( val, function( val ) {
+					return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+				} );
+			}
+
+			return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
 		} ).get();
 	}
 } );
@@ -8322,11 +8467,11 @@ jQuery.fn.extend( {
 var
 	r20 = /%20/g,
 	rhash = /#.*$/,
-	rts = /([?&])_=[^&]*/,
+	rantiCache = /([?&])_=[^&]*/,
 	rheaders = /^(.*?):[ \t]*([^\r\n]*)$/mg,
 
 	// #7653, #8125, #8152: local protocol detection
-	rlocalProtocol = /^(?:about|app|app-storage|.+-extension|file|res|widget):$/,
+	rlocalProtocol = /^(?:about|app|app-storage|.+-extension|file|res|widget):$/,//?:是非捕获组(不记忆的)，匹配about|app|app-storage|, . 表示任何字符 +是贪婪匹配,应该是匹配任何字符接-extension，继续匹配file|res|widget，:$是什么意思?字符串以：结束,这里是'file:'
 	rnoContent = /^(?:GET|HEAD)$/,
 	rprotocol = /^\/\//,
 
@@ -8368,7 +8513,7 @@ function addToPrefiltersOrTransports( structure ) {
 
 		var dataType,
 			i = 0,
-			dataTypes = dataTypeExpression.toLowerCase().match( rnotwhite ) || [];
+			dataTypes = dataTypeExpression.toLowerCase().match( rnothtmlwhite ) || [];
 
 		if ( jQuery.isFunction( func ) ) {
 
@@ -8407,7 +8552,7 @@ function inspectPrefiltersOrTransports( structure, options, originalOptions, jqX
 				inspect( dataTypeOrTransport );
 				return false;
 			} else if ( seekingTransport ) {
-				return !( selected = dataTypeOrTransport );
+				return !( selected = dataTypeOrTransport );//each里面return false跳出了
 			}
 		} );
 		return selected;
@@ -8424,11 +8569,11 @@ function ajaxExtend( target, src ) {
 		flatOptions = jQuery.ajaxSettings.flatOptions || {};
 
 	for ( key in src ) {
-		if ( src[ key ] !== undefined ) {//将deep强制转换成对象再把src对象内容浅拷贝到deep中,为什么要经过中间这步?
+		if ( src[ key ] !== undefined ) {//将src中的key复制到deep中，flatOptions里面的key/val复制到target里面，deep只是拷贝了最外层,除了flatOptions里面有数据的context和url之外基本都深拷贝
 			( flatOptions[ key ] ? target : ( deep || ( deep = {} ) ) )[ key ] = src[ key ];
 		}
 	}
-	if ( deep ) {
+	if ( deep ) {//因为最外层不够深入,所以深拷贝deep到target中去
 		jQuery.extend( true, target, deep );
 	}
 
@@ -8602,12 +8747,12 @@ jQuery.extend( {
 	lastModified: {},
 	etag: {},
 
-	ajaxSettings: {
+	ajaxSettings: {//这个是ajax的基本设置项,要extends到target里面去，为什么target要深拷贝?
 		url: location.href,
 		type: "GET",
-		isLocal: rlocalProtocol.test( location.protocol ),
+		isLocal: rlocalProtocol.test( location.protocol ),//本地协议检测 file:
 		global: true,
-		processData: true,
+		processData: true,//这个有啥用?把data转成string
 		async: true,
 		contentType: "application/x-www-form-urlencoded; charset=UTF-8",
 
@@ -8624,7 +8769,7 @@ jQuery.extend( {
 		*/
 
 		accepts: {
-			"*": allTypes,
+			"*": allTypes,// */*
 			text: "text/plain",
 			html: "text/html",
 			xml: "application/xml, text/xml",
@@ -8672,7 +8817,7 @@ jQuery.extend( {
 
 	// Creates a full fledged settings object into target
 	// with both ajaxSettings and settings fields.
-	// If target is omitted, writes into ajaxSettings.
+	// If target is omitted, writes into ajaxSettings.?
 	ajaxSetup: function( target, settings ) {
 		return settings ?
 
@@ -8687,16 +8832,16 @@ jQuery.extend( {
 	ajaxTransport: addToPrefiltersOrTransports( transports ),
 
 	// Main method
-	ajax: function( url, options ) {
+	ajax: function( url, options ) {//这个肯定属于整个jquery对象的一个function,ajax入口,传入一个url对象.options这个参数有什么用?
 
 		// If url is an object, simulate pre-1.5 signature
 		if ( typeof url === "object" ) {
-			options = url;
-			url = undefined;//赋值完清空
+			options = url;//为什么要用额外一个参数替换url对象?
+			url = undefined;
 		}
 
-		// Force options to be an object 好
-		options = options || {};
+		// Force options to be an object
+		options = options || {};//强制转成对象
 
 		var transport,
 
@@ -8726,13 +8871,13 @@ jQuery.extend( {
 			uncached,
 
 			// Create the final options object
-			s = jQuery.ajaxSetup( {}, options ),
+			s = jQuery.ajaxSetup( {}, options ),//ajaxSetup执行的是把ajax基本设置和用户输入的设置合并了赋值给s
 
 			// Callbacks context
-			callbackContext = s.context || s,
+			callbackContext = s.context || s,//回调context就是s也就是一个对象
 
 			// Context for global events is callbackContext if it is a DOM node or jQuery collection
-			globalEventContext = s.context &&
+			globalEventContext = s.context &&//jQuery对象或者jQuery.event
 				( callbackContext.nodeType || callbackContext.jquery ) ?
 					jQuery( callbackContext ) :
 					jQuery.event,
@@ -8776,7 +8921,7 @@ jQuery.extend( {
 				},
 
 				// Caches the header
-				setRequestHeader: function( name, value ) {
+				setRequestHeader: function( name, value ) {//设置服务端Header Accept:'*/*'是什么意思? Basic Auth也是在这里设置的
 					if ( completed == null ) {
 						name = requestHeadersNames[ name.toLowerCase() ] =
 							requestHeadersNames[ name.toLowerCase() ] || name;
@@ -8824,19 +8969,19 @@ jQuery.extend( {
 			};
 
 		// Attach deferreds
-		deferred.promise( jqXHR );
+		deferred.promise( jqXHR );//给jqXHR也合并promise的东西
 
 		// Add protocol if not provided (prefilters might expect it)
 		// Handle falsy url in the settings object (#10093: consistency with old signature)
 		// We also use the url parameter if available
 		s.url = ( ( url || s.url || location.href ) + "" )
-			.replace( rprotocol, location.protocol + "//" );
+			.replace( rprotocol, location.protocol + "//" );//如果以//开始替换为file:
 
 		// Alias method option to type as per ticket #12004
 		s.type = options.method || options.type || s.method || s.type;
 
 		// Extract dataTypes list
-		s.dataTypes = ( s.dataType || "*" ).toLowerCase().match( rnotwhite ) || [ "" ];
+		s.dataTypes = ( s.dataType || "*" ).toLowerCase().match( rnothtmlwhite ) || [ "" ];
 
 		// A cross-domain request is in order when the origin doesn't match the current origin.
 		if ( s.crossDomain == null ) {
@@ -8849,10 +8994,10 @@ jQuery.extend( {
 				urlAnchor.href = s.url;
 
 				// Support: IE <=8 - 11 only
-				// Anchor's host property isn't correctly set when s.url is relative
+				// Anchor's host property isn't correctly set when s.url is relative ??
 				urlAnchor.href = urlAnchor.href;
 				s.crossDomain = originAnchor.protocol + "//" + originAnchor.host !==
-					urlAnchor.protocol + "//" + urlAnchor.host;
+					urlAnchor.protocol + "//" + urlAnchor.host;//??
 			} catch ( e ) {
 
 				// If there is an error parsing the URL, assume it is crossDomain,
@@ -8867,7 +9012,7 @@ jQuery.extend( {
 		}
 
 		// Apply prefilters
-		inspectPrefiltersOrTransports( prefilters, s, options, jqXHR );
+		inspectPrefiltersOrTransports( prefilters, s, options, jqXHR );//?
 
 		// If request was aborted inside a prefilter, stop there
 		if ( completed ) {
@@ -8880,37 +9025,37 @@ jQuery.extend( {
 
 		// Watch for a new set of requests
 		if ( fireGlobals && jQuery.active++ === 0 ) {
-			jQuery.event.trigger( "ajaxStart" );
+			jQuery.event.trigger( "ajaxStart" );//jQuery.event好犀利,居然trigger ajaxStart，但貌似并没的执行啥?
 		}
 
 		// Uppercase the type
 		s.type = s.type.toUpperCase();
 
 		// Determine if request has content
-		s.hasContent = !rnoContent.test( s.type );
+		s.hasContent = !rnoContent.test( s.type );//GET和HEAD没有内容?
 
 		// Save the URL in case we're toying with the If-Modified-Since
 		// and/or If-None-Match header later on
 		// Remove hash to simplify url manipulation
-		cacheURL = s.url.replace( rhash, "" );
+		cacheURL = s.url.replace( rhash, "" );// /#.*$/ #后面的内容不解析?所以移除掉
 
 		// More options handling for requests with no content
 		if ( !s.hasContent ) {
 
 			// Remember the hash so we can put it back
-			uncached = s.url.slice( cacheURL.length );
+			uncached = s.url.slice( cacheURL.length );//切出#号后面的hash
 
 			// If data is available, append data to url
-			if ( s.data ) {
-				cacheURL += ( rquery.test( cacheURL ) ? "&" : "?" ) + s.data;
+			if ( s.data ) {//所以get请求会把data的参数挂到url上
+				cacheURL += ( rquery.test( cacheURL ) ? "&" : "?" ) + s.data;//有问号加&否则加?号
 
 				// #9682: remove data so that it's not used in an eventual retry
 				delete s.data;
 			}
 
-			// Add anti-cache in uncached url if needed
+			// Add or update anti-cache param if needed
 			if ( s.cache === false ) {
-				cacheURL = cacheURL.replace( rts, "" );
+				cacheURL = cacheURL.replace( rantiCache, "$1" );
 				uncached = ( rquery.test( cacheURL ) ? "&" : "?" ) + "_=" + ( nonce++ ) + uncached;
 			}
 
@@ -8961,15 +9106,15 @@ jQuery.extend( {
 		}
 
 		// Aborting is no longer a cancellation
-		strAbort = "abort";
+		strAbort = "abort";//??
 
 		// Install callbacks on deferreds
 		completeDeferred.add( s.complete );
-		jqXHR.done( s.success );
-		jqXHR.fail( s.error );
+		jqXHR.done( s.success );//ajax成功 resolve
+		jqXHR.fail( s.error );//失败
 
 		// Get transport
-		transport = inspectPrefiltersOrTransports( transports, s, options, jqXHR );
+		transport = inspectPrefiltersOrTransports( transports, s, options, jqXHR );//??返回了send和abort
 
 		// If no transport, we auto-abort
 		if ( !transport ) {
@@ -9268,15 +9413,15 @@ var xhrSuccessStatus = {
 support.cors = !!xhrSupported && ( "withCredentials" in xhrSupported );
 support.ajax = xhrSupported = !!xhrSupported;
 
-jQuery.ajaxTransport( function( options ) {
+jQuery.ajaxTransport( function( options ) {//??加了send和abort2个函数?
 	var callback, errorCallback;
 
 	// Cross domain only allowed if supported through XMLHttpRequest
 	if ( support.cors || xhrSupported && !options.crossDomain ) {
 		return {
-			send: function( headers, complete ) {
+			send: function( headers, complete ) {//header是ajax写的header加Accept，complete是done function
 				var i,
-					xhr = options.xhr();
+					xhr = options.xhr();//xhr()就是new window.XMLHttpRequest();
 
 				xhr.open(
 					options.type,
@@ -9284,7 +9429,7 @@ jQuery.ajaxTransport( function( options ) {
 					options.async,
 					options.username,
 					options.password
-				);
+				);//xhr.open有啥用?
 
 				// Apply custom fields if provided
 				if ( options.xhrFields ) {
@@ -9314,7 +9459,7 @@ jQuery.ajaxTransport( function( options ) {
 
 				// Callback
 				callback = function( type ) {
-					return function() {
+					return function() {//xhr.onload function
 						if ( callback ) {
 							callback = errorCallback = xhr.onload =
 								xhr.onerror = xhr.onabort = xhr.onreadystatechange = null;
@@ -9414,7 +9559,7 @@ jQuery.ajaxTransport( function( options ) {
 // Prevent auto-execution of scripts when no explicit dataType was provided (See gh-2432)
 jQuery.ajaxPrefilter( function( s ) {
 	if ( s.crossDomain ) {
-		s.contents.script = false;
+		s.contents.script = false;//？？
 	}
 } );
 
@@ -9649,7 +9794,7 @@ jQuery.fn.load = function( url, params, callback ) {
 		off = url.indexOf( " " );
 
 	if ( off > -1 ) {
-		selector = jQuery.trim( url.slice( off ) );
+		selector = stripAndCollapse( url.slice( off ) );
 		url = url.slice( 0, off );
 	}
 
@@ -10041,11 +10186,10 @@ if ( typeof define === "function" && define.amd ) {
 
 
 
-
 var
 
 	// Map over jQuery in case of overwrite
-	_jQuery = window.jQuery,
+	_jQuery = window.jQuery,//存储原来的jQuery和$
 
 	// Map over the $ in case of overwrite
 	_$ = window.$;
@@ -10066,8 +10210,11 @@ jQuery.noConflict = function( deep ) {
 // (#7102#comment:10, https://github.com/jquery/jquery/pull/557)
 // and CommonJS for browser emulators (#13566)
 if ( !noGlobal ) {
-	window.jQuery = window.$ = jQuery;
+	window.jQuery = window.$ = jQuery;//这里把jQuery暴露到全局变量
 }
+
+
+
 
 
 return jQuery;
@@ -10075,8 +10222,41 @@ return jQuery;
 
 
 
-//////////////////
-// WEBPACK FOOTER
-// ./~/.npminstall/jquery/3.1.0/jquery/dist/jquery.js
-// module id = 19
-// module chunks = 0
+
+//jQuery.ajaxSettings
+{
+  "url": "file:///C:/Users/Xian%20Guo/Desktop/demo/index.html",
+  "type": "GET",
+  "isLocal": true,
+  "global": true,
+  "processData": true,//这个有什么用?
+  "async": true,
+  "contentType": "application/x-www-form-urlencoded; charset=UTF-8",
+  "accepts": {
+    "*": "*/*",
+    "text": "text/plain",
+    "html": "text/html",
+    "xml": "application/xml, text/xml",
+    "json": "application/json, text/javascript",
+    "script": "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript"
+  },
+  "contents": {
+    "xml": {},
+    "html": {},
+    "json": {},
+    "script": {}
+  },
+  "responseFields": {
+    "xml": "responseXML",
+    "text": "responseText",
+    "json": "responseJSON"
+  },
+  "converters": {
+    "text html": true
+  },
+  "flatOptions": {
+    "url": true,
+    "context": true
+  },
+  "jsonp": "callback"
+}

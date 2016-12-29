@@ -727,3 +727,22 @@ if (!$(this).data['bindEvents']) {
 $(this).data[''bindEvents'] = true;
         }
 })
+
+
+
+One common convention for large load times is to not render elements until they have finished the request.
+Are you familiar with this idea?
+It is called "data structures and algorithms", CS61B
+
+
+//这是通过a创建一个b并link prototype,如果b已经存在的话就只需要把prototype link就好了,a.prototype = Object.create(b.prototype)
+var a = { a: () => console.log(this,"a")};
+var b = Object.create(a, { b: () => console.log(this,"b")});
+a.a() //window, a
+b.a() //window, a
+
+
+var a = { a: function() {console.log(this,"a")} };
+var b = Object.create(a, { b: function() {console.log(this,"b")} });
+a.a() //a Object {}, a
+b.a() //Object {b: undefined }, a

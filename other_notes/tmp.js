@@ -746,3 +746,210 @@ var a = { a: function() {console.log(this,"a")} };
 var b = Object.create(a, { b: function() {console.log(this,"b")} });
 a.a() //a Object {}, a
 b.a() //Object {b: undefined }, a
+
+
+pure function:
+封装在内部，不改变外部的global state
+如 length = (list) ->
+     index = 0
+     index++ while list[index] isnt undefined
+     index
+
+map = (f,list) ->
+     result = []
+     result.push(f x) for x in list
+     result
+#map:: (a->b) ->[a]->[b]
+
+map = (f, [x, xs...]) ->
+     if x is undefined
+         []
+     else
+          [f(x),map(f, xs)...]
+
+纯函数不改变state，they give you expression you're trying to calculate, you can replace do it recursively.
+So the state are encapsulated and side effect don't leak out.
+
+Promises
+immutable value.
+
+async.parallel [
+    (callback) ->
+        fs.readFile 'package.json', 'utf8', callback
+    ,
+
+    (callback) ->
+        url = 'http://api.github.com/users/faye/repos'
+        http.get url callback
+    ,
+
+    (callback) ->
+        db.get 'users:4', callback
+], (error, [file, response, user]) ->
+    console.log file
+    console.log response
+    console.log user
+Laziness
+Streams
+
+
+
+一直要想着做到最好，不能有留到后面的想法，速度快
+Good parts:
+返回一个函数，由于闭包的存在所以在递归时不需要很多的内存消耗?
+... operator
+modules good interfaces
+Object.create instead of new, stop using this
+多学几门语言
+
+function repeat( func ){
+    var value;
+    do{
+       value = func();   
+    } while (value !== undefined);
+} 
+
+//this one below is good
+
+function repeat( func ) {
+    if(func() !== undefined ) {
+        return repeat(func);
+    }
+}
+
+Prototypal Inheritance
+1.Memory conservation
+2.May have made sense in 1995
+3.Confusing:Own vs inherited
+4.Retroactive heredity
+5.Performance inhibiting
+
+Class Free
+
+Block Scope
+Function Scope
+closure
+function green () {
+    let a;
+    function yellow () {
+        let b;//b can see a but a can not see b
+        ...a...
+        ...b...
+    }
+    ...a...
+}
+
+
+
+function constructor ( spec ) {
+    var that = other_constructor (spec),
+        member,
+        method = function () {
+            //spec, member, method
+        };
+
+    that.method = method;
+
+    return that;
+}
+
+
+asynchronous programming
+1.app startup
+2.player
+3.data access
+4.animations
+5.view/model binding
+
+async problems
+1.memory leaks(eg:forget to unsubscribe to event)
+2.race conditions
+3.callback hell
+4.complex state machines
+5.error handling
+
+
+function play(movieId, cancelButton, callback) {
+    var movieTicket,
+        playError,
+        tryFinish = function () {
+            if(playError) {
+                callback(null, playError);
+            }
+            else if(movieTicket && player.initialized) {
+                callback(null, ticket);
+            }
+        };
+    cancelButton.addEventListener("click", function() {
+        playError = "cancelled";
+    });
+    if(!player.initialized) {
+        player.init(function(error) {
+            playError = error;
+            tryFinish();
+        });
+        authorizeMovie(function(error,ticket) {
+            playError = error;
+            movieTicket = ticket;
+            tryFinish();
+        });
+    }
+    
+}
+
+
+iterator and observer
+
+Observer pattern
+
+document.addEventListener(
+    "mousemove",
+    function next(e) {
+        console.log(e);
+    });
+//{ clientX:425, clientY:543 }
+
+iterator<----progressively send information to consumer ---->Observer
+
+var getTopRatedFilms = user =>
+    user.videoLists.
+        map(videoList.videos.
+            filter(video => video.rating === 5.0)).
+        concatAll();
+
+getTopRatedFilms(user).forEach(film => console.log(film));
+
+
+
+var getElementDrags = elmt =>
+    elmt.mouseDown =>
+        map(mouseDown =>
+            document.mouseMoves.
+                filter takeUntil(document.mouseUps)).
+        concatAll();
+
+getElementDrags(image).
+    forEach(pos => image.position = pos);
+
+
+Observable Type + Array Functions (and more)
+
+Observable can model ...
+1.Events
+2.Animations
+3.Async IO
+
+
+Observable.forEach
+
+//subscribe
+var subscription = 
+    mouseMoves.forEach(console.log);
+
+
+//unsubscribe
+subscription.dispose();
+
+
+
+

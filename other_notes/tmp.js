@@ -951,5 +951,16 @@ var subscription =
 subscription.dispose();
 
 
+//currying
+function x(a,b,c) {
+  return [this.y,a,b,c];
+}
 
+j = x.bind(null,1,2);
 
+function z() {
+  this.y = 'b';
+  return j.call(this,3);
+}
+
+z()

@@ -964,3 +964,23 @@ function z() {
 }
 
 z()
+
+
+
+//static and prototype
+
+function Foo() {
+  this.name = "Foo";
+  this.sayName = function() {
+    console.log("called this method!");//1
+  };
+}
+
+Foo.sayName = function() {
+  console.log("called static method!");//这个不能通过实例来调用,得通过constructor来调用
+}
+
+
+Foo.prototype.sayName = function() {
+  console.log("called prototype method!");//2
+}

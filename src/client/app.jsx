@@ -14,7 +14,7 @@ const store = createStore(combineReducers({
 ReactDOM.render(
     <Provider store={store}>
         <div>
-        <span>somehing</span>
+        <span>something good!~</span>
             <BarkMessage />
             <BarkButton />
         </div>

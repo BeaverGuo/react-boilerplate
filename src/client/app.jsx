@@ -3,9 +3,9 @@ import React, { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import { createStore, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
-import dogReducer from './reducers/dog-reducer';
-import BarkMessage from './containers/bark-message';
-import BarkButton from './containers/bark-button';
+import dogReducer from './reducers/dog_reducers';
+import BarkMessage from './containers/bark_message';
+import BarkButton from './containers/bark_button';
 
 const store = createStore(combineReducers({
     dog: dogReducer,
@@ -14,10 +14,8 @@ const store = createStore(combineReducers({
 ReactDOM.render(
     <Provider store={store}>
         <div>
-        <span>something good!~</span>
             <BarkMessage />
             <BarkButton />
         </div>
     </Provider>
-    ,document.getElementById('app')
-);
+    , document.getElementById('app'));

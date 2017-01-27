@@ -1,28 +1,3 @@
-//currently not used
-var path = require('path');
-var webpack = require('webpack');
-var express = require('express');
-var config = require('../../webpack.config.babel');
-//import config from '../../webpack.config.babel';
-
-var app = express();
-var compiler = webpack(config);
-
-app.use(require('webpack-dev-middleware')(compiler, {
-  publicPath: config.output.path
-}));
-
-app.use(require('webpack-hot-middleware')(compiler));
-
-app.get('*', function(req, res) {
-  res.sendFile(path.join('../../dist', 'index.html'));
-});
-
-app.listen(3000, function(err) {
-  if (err) {
-    return console.error(err);
-  }
-
-  console.log('Listening at http://localhost:3000/');
-})
-
+import Dog from './dog';
+const toby = new Dog('Toby');
+console.log(toby.bark());

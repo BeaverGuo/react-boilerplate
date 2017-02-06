@@ -1,3 +1,9 @@
+trace:
+combineReducers->createStore
+ReactDOM.render->ReactElementValidator->ReactElement创建对象
+
+
+
 
 1.render部分
 

@@ -1,6 +1,3 @@
-/*What makes React important is the shift from global, template-based layouts to distinct, data-driven components.
-render的错误被promise的catch捕获到了
-*/
 1.this in js
 /*These two snippets are different:
 

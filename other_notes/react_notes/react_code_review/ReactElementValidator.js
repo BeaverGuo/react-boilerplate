@@ -154,7 +154,7 @@ function validatePropTypes(element) {
     process.env.NODE_ENV !== 'production' ? warning(componentClass.getDefaultProps.isReactClassApproved, 'getDefaultProps is only used on classic React.createClass ' + 'definitions. Use a static property named `defaultProps` instead.') : void 0;
   }
 }
-//react html怎么自动跑这里的?
+//这个主要是验证react element.react html <Provider store={store}>怎么自动跑这里的?
 var ReactElementValidator = {
 
   createElement: function (type, props, children) {

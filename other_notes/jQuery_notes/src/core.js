@@ -315,10 +315,10 @@ jQuery.extend( {
 	},
 
 	// Support: Android <=4.0 only
-	trim: function( text ) {
+	trim: function( text ) {//有用
 		return text == null ?
 			"" :
-			( text + "" ).replace( rtrim, "" );
+			( text + "" ).replace( rtrim, "" );//用+来转string
 	},
 
 	// results is for internal usage only
@@ -326,7 +326,7 @@ jQuery.extend( {
 		var ret = results || [];
 
 		if ( arr != null ) {
-			if ( isArrayLike( Object( arr ) ) ) {
+			if ( isArrayLike( Object( arr ) ) ) {//转对象Object()
 				jQuery.merge( ret,
 					typeof arr === "string" ?
 					[ arr ] : arr
@@ -359,12 +359,12 @@ jQuery.extend( {
 
 		return first;
 	},
-
+	//查找callback返回为invert取反的结果集
 	grep: function( elems, callback, invert ) {
 		var callbackInverse,
 			matches = [],
 			i = 0,
-			length = elems.length,
+			length = elems.length,//先算好
 			callbackExpect = !invert;
 
 		// Go through the array, only saving the items
@@ -407,7 +407,7 @@ jQuery.extend( {
 			}
 		}
 
-		// Flatten any nested arrays
+		// Flatten any nested arrays 好
 		return concat.apply( [], ret );
 	},
 
@@ -416,6 +416,7 @@ jQuery.extend( {
 
 	// Bind a function to a context, optionally partially applying any
 	// arguments.
+	//partially apply
 	proxy: function( fn, context ) {
 		var tmp, args, proxy;
 
@@ -451,7 +452,7 @@ jQuery.extend( {
 } );
 
 if ( typeof Symbol === "function" ) {
-	jQuery.fn[ Symbol.iterator ] = arr[ Symbol.iterator ];
+	jQuery.fn[ Symbol.iterator ] = arr[ Symbol.iterator ];//?让jQuery可迭代？
 }
 
 // Populate the class2type map

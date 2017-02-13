@@ -1,0 +1,3 @@
+
+1.createStore()将combineReducer函数的返回值(combination函数)传入
+2.combineReducer在combineReducers.js里面 

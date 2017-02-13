@@ -242,19 +242,19 @@ jQuery.extend( {
 			return false;
 		}
 
-		proto = getProto( obj );
-
+		proto = getProto( obj ); //Object.getPrototypeOf()
+		//没有prototype
 		// Objects with no prototype (e.g., `Object.create( null )`) are plain
 		if ( !proto ) {
 			return true;
 		}
 
 		// Objects with prototype are plain iff they were constructed by a global Object function
-		Ctor = hasOwn.call( proto, "constructor" ) && proto.constructor;
+		Ctor = hasOwn.call( proto, "constructor" ) && proto.constructor;//存在则取其值  这样写
 		return typeof Ctor === "function" && fnToString.call( Ctor ) === ObjectFunctionString;
 	},
 
-	isEmptyObject: function( obj ) {
+	isEmptyObject: function( obj ) {//empty判断,可枚举
 
 		/* eslint-disable no-unused-vars */
 		// See https://github.com/eslint/eslint/issues/6125

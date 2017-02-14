@@ -15,7 +15,7 @@ define( [
 var
 	rkeyEvent = /^key/,
 	rmouseEvent = /^(?:mouse|pointer|contextmenu|drag|drop)|click/,
-	rtypenamespace = /^([^.]*)(?:\.(.+)|)/;
+	rtypenamespace = /^([^.]*)(?:\.(.+)|)/;//不是.开始 .任意   匹配.左右两边的?
 
 function returnTrue() {
 	return true;
@@ -40,13 +40,13 @@ function on( elem, types, selector, data, fn, one ) {
 	if ( typeof types === "object" ) {
 
 		// ( types-Object, selector, data )
-		if ( typeof selector !== "string" ) {
+		if ( typeof selector !== "string" ) {//处理( types-Object, data ), jq的函数传参检测很好
 
 			// ( types-Object, data )
 			data = data || selector;
 			selector = undefined;
 		}
-		for ( type in types ) {
+		for ( type in types ) {//递归types
 			on( elem, type, selector, data, types[ type ], one );
 		}
 		return elem;
@@ -107,7 +107,7 @@ jQuery.event = {
 		var handleObjIn, eventHandle, tmp,
 			events, t, handleObj,
 			special, handlers, type, namespaces, origType,
-			elemData = dataPriv.get( elem );
+			elemData = dataPriv.get( elem );//取缓存的data对象
 
 		// Don't attach events to noData or text/comment nodes (but allow plain objects)
 		if ( !elemData ) {
@@ -123,7 +123,7 @@ jQuery.event = {
 
 		// Ensure that invalid selectors throw exceptions at attach time
 		// Evaluate against documentElement in case elem is a non-element node (e.g., document)
-		if ( selector ) {
+		if ( selector ) {//selector取到的和documentElement是否匹配?
 			jQuery.find.matchesSelector( documentElement, selector );
 		}
 
@@ -133,7 +133,7 @@ jQuery.event = {
 		}
 
 		// Init the element's event structure and main handler, if this is the first
-		if ( !( events = elemData.events ) ) {
+		if ( !( events = elemData.events ) ) {//单例?
 			events = elemData.events = {};
 		}
 		if ( !( eventHandle = elemData.handle ) ) {
@@ -152,7 +152,7 @@ jQuery.event = {
 		while ( t-- ) {
 			tmp = rtypenamespace.exec( types[ t ] ) || [];
 			type = origType = tmp[ 1 ];
-			namespaces = ( tmp[ 2 ] || "" ).split( "." ).sort();
+			namespaces = ( tmp[ 2 ] || "" ).split( "." ).sort();//?
 
 			// There *must* be a type, no attaching namespace-only handlers
 			if ( !type ) {
@@ -204,7 +204,7 @@ jQuery.event = {
 			}
 
 			// Add to the element's handler list, delegates in front
-			if ( selector ) {
+			if ( selector ) {//delegateCount索引加handleObj
 				handlers.splice( handlers.delegateCount++, 0, handleObj );
 			} else {
 				handlers.push( handleObj );
@@ -319,6 +319,7 @@ jQuery.event = {
 
 		// Run delegates first; they may want to stop propagation beneath us
 		i = 0;
+		//赋值和判断在一起
 		while ( ( matched = handlerQueue[ i++ ] ) && !event.isPropagationStopped() ) {
 			event.currentTarget = matched.elem;
 

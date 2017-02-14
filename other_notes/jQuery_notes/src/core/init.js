@@ -16,7 +16,7 @@ var rootjQuery,
 	// Strict HTML recognition (#11290: must start with <)
 	// Shortcut simple #id case for speed
 	rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]+))$/,
-
+	//构造函数init
 	init = jQuery.fn.init = function( selector, context, root ) {
 		var match, elem;
 
@@ -60,7 +60,7 @@ var rootjQuery,
 					// HANDLE: $(html, props)
 					if ( rsingleTag.test( match[ 1 ] ) && jQuery.isPlainObject( context ) ) {
 						for ( match in context ) {
-
+							//考虑了各种情况
 							// Properties of context are called as methods if possible
 							if ( jQuery.isFunction( this[ match ] ) ) {
 								this[ match ]( context[ match ] );
@@ -74,7 +74,7 @@ var rootjQuery,
 
 					return this;
 
-				// HANDLE: $(#id)
+				// HANDLE: $(#id) 第2个捕获组为id
 				} else {
 					elem = document.getElementById( match[ 2 ] );
 
@@ -97,7 +97,7 @@ var rootjQuery,
 				return this.constructor( context ).find( selector );
 			}
 
-		// HANDLE: $(DOMElement)
+		// HANDLE: $(DOMElement) 支持DOM元素直接传入
 		} else if ( selector.nodeType ) {
 			this[ 0 ] = selector;
 			this.length = 1;

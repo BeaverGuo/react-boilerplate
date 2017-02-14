@@ -30,7 +30,7 @@ function buildFragment( elems, context, scripts, selection, ignored ) {
 				// push.apply(_, arraylike) throws on ancient WebKit
 				jQuery.merge( nodes, elem.nodeType ? [ elem ] : elem );
 
-			// Convert non-html into a text node
+			// Convert non-html into a text node 文本用createTextNode
 			} else if ( !rhtml.test( elem ) ) {
 				nodes.push( context.createTextNode( elem ) );
 
@@ -42,7 +42,7 @@ function buildFragment( elems, context, scripts, selection, ignored ) {
 				tag = ( rtagName.exec( elem ) || [ "", "" ] )[ 1 ].toLowerCase();
 				wrap = wrapMap[ tag ] || wrapMap._default;
 				tmp.innerHTML = wrap[ 1 ] + jQuery.htmlPrefilter( elem ) + wrap[ 2 ];
-
+				//jQuery.htmlPrefilter在哪
 				// Descend through wrappers to the right content
 				j = wrap[ 0 ];
 				while ( j-- ) {

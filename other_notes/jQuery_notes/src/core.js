@@ -28,7 +28,7 @@ var
 
 	// Define a local copy of jQuery
 	jQuery = function( selector, context ) {
-
+		//代理机制
 		// The jQuery object is actually just the init constructor 'enhanced'
 		// Need init if jQuery is called (just allow error to be thrown if not included)
 		return new jQuery.fn.init( selector, context );
@@ -450,9 +450,11 @@ jQuery.extend( {
 	// properties to it so it needs to exist.
 	support: support
 } );
-
+//为了变成可遍历对象， 一个对象必须实现 @@iterator 方法, 
+//意思是这个对象（或者它原型链prototype chain上的某个对象）
+//必须有一个名字是 Symbol.iterator 的属性:
 if ( typeof Symbol === "function" ) {
-	jQuery.fn[ Symbol.iterator ] = arr[ Symbol.iterator ];//?让jQuery可迭代？
+	jQuery.fn[ Symbol.iterator ] = arr[ Symbol.iterator ];//?让jQuery对象可迭代？
 }
 
 // Populate the class2type map

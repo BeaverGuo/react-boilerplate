@@ -14,6 +14,7 @@ define( [
 // context (optional): If specified, the fragment will be created in this context,
 // defaults to document
 // keepScripts (optional): If true, will include scripts passed in the html string
+// 把string @data转成html
 jQuery.parseHTML = function( data, context, keepScripts ) {
 	if ( typeof data !== "string" ) {
 		return [];
@@ -24,7 +25,7 @@ jQuery.parseHTML = function( data, context, keepScripts ) {
 	}
 
 	var base, parsed, scripts;
-
+	//检查context
 	if ( !context ) {
 
 		// Stop scripts or inline event handlers from being executed immediately
@@ -47,7 +48,7 @@ jQuery.parseHTML = function( data, context, keepScripts ) {
 	scripts = !keepScripts && [];
 
 	// Single tag
-	if ( parsed ) {
+	if ( parsed ) {//createElement或者buildFragment
 		return [ context.createElement( parsed[ 1 ] ) ];
 	}
 

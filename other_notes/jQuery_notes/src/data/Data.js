@@ -12,13 +12,13 @@ function Data() {
 
 Data.uid = 1;
 
-Data.prototype = {
-
+Data.prototype = {//写原型
+	//如果能有数据把value放到owner[this.expando]里面,对象的话不可枚举
 	cache: function( owner ) {
 
 		// Check if the owner object already has a cache
 		var value = owner[ this.expando ];
-
+		//单例?
 		// If not, create one
 		if ( !value ) {
 			value = {};
@@ -26,7 +26,7 @@ Data.prototype = {
 			// We can accept data for non-element nodes in modern browsers,
 			// but we should not, see #8335.
 			// Always return an empty object.
-			if ( acceptData( owner ) ) {
+			if ( acceptData( owner ) ) {//是否能有数据
 
 				// If it is a node unlikely to be stringify-ed or looped over
 				// use plain assignment
@@ -66,13 +66,15 @@ Data.prototype = {
 		}
 		return cache;
 	},
+	//取缓存到owner[this.expando]里面数据key对应的value
 	get: function( owner, key ) {
 		return key === undefined ?
 			this.cache( owner ) :
 
 			// Always use camelCase key (gh-2257)
-			owner[ this.expando ] && owner[ this.expando ][ jQuery.camelCase( key ) ];
+			owner[ this.expando ] && owner[ this.expando ][ jQuery.camelCase( key ) ];//老技巧了,&&存在则取
 	},
+
 	access: function( owner, key, value ) {
 
 		// In cases where either:
@@ -85,7 +87,7 @@ Data.prototype = {
 		//
 		//   1. The entire cache object
 		//   2. The data stored at the key
-		//
+		//没给key或给了key没value则取对象
 		if ( key === undefined ||
 				( ( key && typeof key === "string" ) && value === undefined ) ) {
 
@@ -108,7 +110,7 @@ Data.prototype = {
 		var i,
 			cache = owner[ this.expando ];
 
-		if ( cache === undefined ) {
+		if ( cache === undefined ) {//早排除
 			return;
 		}
 
@@ -144,7 +146,7 @@ Data.prototype = {
 			// Webkit & Blink performance suffers when deleting properties
 			// from DOM nodes, so set to undefined instead
 			// https://bugs.chromium.org/p/chromium/issues/detail?id=378607 (bug restricted)
-			if ( owner.nodeType ) {
+			if ( owner.nodeType ) {//DOM node设为undefined而不是delete
 				owner[ this.expando ] = undefined;
 			} else {
 				delete owner[ this.expando ];

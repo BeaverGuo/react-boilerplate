@@ -82,14 +82,14 @@ function on( elem, types, selector, data, fn, one ) {
 		fn = function( event ) {
 
 			// Can use an empty set, since event contains the info
-			jQuery().off( event );
+			jQuery().off( event );//?
 			return origFn.apply( this, arguments );
 		};
 
 		// Use same guid so caller can remove using origFn
 		fn.guid = origFn.guid || ( origFn.guid = jQuery.guid++ );
 	}
-	return elem.each( function() {
+	return elem.each( function() {//处理elem是一个数组的情况
 		jQuery.event.add( this, types, fn, data, selector );
 	} );
 }

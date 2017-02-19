@@ -47,7 +47,7 @@
 
 var arr = [];
 
-var document = window.document;//通过闭包传入window对象，防止document被其他插件修改，下面也是一样的道理
+var document = window.document;
 
 var getProto = Object.getPrototypeOf;
 
@@ -73,7 +73,7 @@ var support = {};
 
 
 
-	function DOMEval( code, doc ) {
+	function DOMEval( code, doc ) {//?
 		doc = doc || document;
 
 		var script = doc.createElement( "script" );

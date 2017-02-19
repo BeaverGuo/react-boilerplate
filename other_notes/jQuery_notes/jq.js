@@ -1,3 +1,12 @@
+jQuery version 1.6
+
+07-event.js
+
+
+
+
+
+
 jquery 1.10.2
 // 压缩策略
 // w -> windwow , u -> undefined

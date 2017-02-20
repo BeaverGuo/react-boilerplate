@@ -215,7 +215,7 @@ jQuery.extend = jQuery.fn.extend = function() {//jQuery深拷贝函数,2个参�
 	}
 
 	// Extend jQuery itself if only one argument is passed
-	if ( i === length ) {//相等是只传了一个参数的情况
+	if ( i === length ) {//相等是只传了一个参数的情况,扩展jQuery
 		target = this;
 		i--;
 	}

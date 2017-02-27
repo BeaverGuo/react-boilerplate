@@ -67,19 +67,19 @@ var hasOwn = class2type.hasOwnProperty;
 
 var fnToString = hasOwn.toString;
 
-var ObjectFunctionString = fnToString.call( Object );
+var ObjectFunctionString = fnToString.call( Object );//"function Object() { [native code] }"
 
 var support = {};
 
 
 
-	function DOMEval( code, doc ) {//?
+	function DOMEval( code, doc ) {
 		doc = doc || document;
 
 		var script = doc.createElement( "script" );
 
-		script.text = code;
-		doc.head.appendChild( script ).parentNode.removeChild( script );
+		script.text = code;//执行这句时候已经运行code了
+		doc.head.appendChild( script ).parentNode.removeChild( script );//运行完后防止script过多 移除
 	}
 /* global Symbol */
 // Defining this global in .eslintrc.json would create a danger of using the global
@@ -215,7 +215,7 @@ jQuery.extend = jQuery.fn.extend = function() {//jQuery深拷贝函数,2个参�
 	}
 
 	// Extend jQuery itself if only one argument is passed
-	if ( i === length ) {//相等是只传了一个参数的情况
+	if ( i === length ) {//相等是只传了一个参数的情况,扩展jQuery
 		target = this;
 		i--;
 	}
@@ -282,7 +282,7 @@ jQuery.extend( {
 
 	isArray: Array.isArray,
 
-	isWindow: function( obj ) {
+	isWindow: function( obj ) {// window.window === window
 		return obj != null && obj === obj.window;
 	},
 
@@ -318,7 +318,7 @@ jQuery.extend( {
 
 		// Objects with prototype are plain iff they were constructed by a global Object function 由Object函数构造出来的也是plain object
 		Ctor = hasOwn.call( proto, "constructor" ) && proto.constructor;
-		return typeof Ctor === "function" && fnToString.call( Ctor ) === ObjectFunctionString;
+		return typeof Ctor === "function" && fnToString.call( Ctor ) === ObjectFunctionString;//"function Object() { [native code] }"
 	},
 
 	isEmptyObject: function( obj ) {
@@ -332,7 +332,7 @@ jQuery.extend( {
 		}
 		return true;
 	},
-
+	//返回类型string "type"
 	type: function( obj ) {
 		if ( obj == null ) {
 			return obj + "";//返回"null"
@@ -355,7 +355,7 @@ jQuery.extend( {
 	camelCase: function( string ) {
 		return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );//把-ms-变成ms-再把-小写变成驼峰?
 	},
-
+	//节点名称
 	nodeName: function( elem, name ) {
 		return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
 	},
@@ -389,6 +389,7 @@ jQuery.extend( {
 	},
 
 	// results is for internal usage only
+	//合并并返回一个数组
 	makeArray: function( arr, results ) {
 		var ret = results || [];
 

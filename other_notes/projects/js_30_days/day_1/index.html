@@ -1,0 +1,59 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JS Drum Kit</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="keys">
+    <div data-key="65" class="key">
+        <!--kbd是键盘输入 -->
+      <kbd>A</kbd>
+      <span class="sound">clap</span>
+    </div>
+    <div data-key="83" class="key">
+      <kbd>S</kbd>
+      <span class="sound">hihat</span>
+    </div>
+    <div data-key="68" class="key">
+      <kbd>D</kbd>
+      <span class="sound">kick</span>
+    </div>
+    <div data-key="70" class="key">
+      <kbd>F</kbd>
+      <span class="sound">openhat</span>
+    </div>
+    <div data-key="71" class="key">
+      <kbd>G</kbd>
+      <span class="sound">boom</span>
+    </div>
+    <div data-key="72" class="key">
+      <kbd>H</kbd>
+      <span class="sound">ride</span>
+    </div>
+    <div data-key="74" class="key">
+      <kbd>J</kbd>
+      <span class="sound">snare</span>
+    </div>
+    <div data-key="75" class="key">
+      <kbd>K</kbd>
+      <span class="sound">tom</span>
+    </div>
+    <div data-key="76" class="key">
+      <kbd>L</kbd>
+      <span class="sound">tink</span>
+    </div>
+  </div>
+
+  <audio data-key="65" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/813391/clap.wav"></audio>
+  <audio data-key="83" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/813391/hihat.wav"></audio>
+  <audio data-key="68" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/813391/kick.wav"></audio>
+  <audio data-key="70" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/813391/openhat.wav"></audio>
+  <audio data-key="71" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/813391/boom.wav"></audio>
+  <audio data-key="72" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/813391/ride.wav"></audio>
+  <audio data-key="74" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/813391/snare.wav"></audio>
+  <audio data-key="75" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/813391/tom.wav"></audio>
+  <audio data-key="76" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/813391/tink.wav"></audio>
+  <script src="index.js"></script>
+</body>
+</html>

@@ -20,7 +20,27 @@
     }
     //window没定义的情况传this
 })(typeof window !== "undefined" ? window : this, function( window, noGlobal ) {
-    
+    "use strict";
+    //简化一些数组和对象方法的名字
+    var arr = [];
+    var document = window.document,
+        getProto = Object.getPrototypeOf(),
+        slice = arr.slice,
+        concat = arr.concat,
+        push = arr.push,
+        indexOf = arr.indexOf,
+        class2type = {},
+        toString = class2type.toString,
+        hasOwn = class2type.hasOwnProperty,
+        fnToString = hasOwn.toString,
+        ObjectFunctionString = fnToString.call(Object),
+        support = {};
+
+
+
+
+
+
     var version = '3.1.1';
     jQuery = function( selector, context ) {
         return new jQuery.fn.init( selector, context );//无new就能例化

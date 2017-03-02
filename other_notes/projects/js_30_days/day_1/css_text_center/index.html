@@ -1,0 +1,49 @@
+<html lang="en">
+<head>
+    <!-- veiwport设置宽度,让设备知道去适应,为设备宽度 
+    This setting will make the browser render the page on a canvas with a width of 320px, and then fit the result as neatly as possible inside the available screen area. If that area is 360px wide (see Figure 2), the content will be scaled up by a factor of 1.125; if it’s 240px wide, expect it to become smaller by a factor of 0.75.
+    device-width:No scaling needed, thank you very much. Just make the viewport as many pixels wide as the device screen width.
+    For those not familiar yet with media queries, you can think of them as conditional hooks that trigger different CSS rules to be applied if a defined set of environmental prerequisites are met. Differently said, media queries allow you to optimize your site for all kinds of screen sizes, and tweak or radically change its layout for varying device contexts.
+    
+    -->
+  <meta charset="UTF-8" name="viewport" content="width=device-width, height=device-height">
+  <title>CSS</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<!-- center solution 1 -->
+    <div class="container">
+        <div id="content">
+            Line 1
+        </div>   
+    </div>
+<!-- test margin: auto -->
+    <div class="container">
+        <div id="hcenter">
+        </div>
+    </div>
+<!-- absolute position -->
+    <div class="rightdown">
+        <div id="rightdown">
+        </div>
+    </div>
+<!-- fixed position 相对viewport-->
+    <div id="fixed">
+    </div>
+<!-- float -->
+    <div id="float">
+        <img src="sample.jpg" id="imgsample" />
+        <img src="sample.jpg" id="imgsampler" />
+            <p id="clearr">some text...some text...some text...
+            </p>
+    
+            <p id="clear">some text...some text...some text...some text...
+            some text...some text...some text...some text...
+            some text...some text...some text...some text...
+            some text...some text...some text...some text...
+            some text...some text...some text...some text...some text...
+            some text...some text...some text...some text...</p>
+    </div>
+  <script src="index.js"></script>
+</body>
+</html>

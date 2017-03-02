@@ -1,0 +1,84 @@
+body {
+  /*css short hand is best for performance, use it a lot*/
+  font: calc((5vh + 5vw) / 2) Arial, sans-serif;
+}
+
+.container {
+  color: white;
+  background: #ffbd17;
+  /*如果不用max-width浏览器窗口变小于宽度时会出横向滚动条,设置了不会*/
+  max-width: 400px;
+  height: 260px;
+  margin: 10px;
+}
+
+#content {
+  background: #06c;
+  width: 120px;
+  margin: 0 auto; /*左右margin auto居中*/
+  position: relative;
+  top: 50%; /*相对自己的起点移动定位,原来的位置还占着,向下移50%这个50%是相对外面容器的*/
+  transform: translateY(-50%); /*加上自身的位置往上提50% 这个又是相对自己的*/
+}
+
+
+#hcenter{
+  margin: 0 auto;
+  background: red;
+  max-width: 120px;
+  height: 120px;
+}
+
+
+.rightdown{
+  color: white;
+  background: #ffbd17;
+  /*如果不用max-width浏览器窗口变小于宽度时会出横向滚动条,设置了不会*/
+  max-width: 400px;
+  height: 260px;
+  margin: 10px;
+  position: relative;
+}
+#rightdown {
+  background: red;
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  top: 120px;
+  left: 190px;
+}
+
+#fixed {
+  position: fixed;
+  background-color: red;
+  width:10vw;
+  height: 10vh;
+  top: 50px;
+  left: 50px;
+}
+
+#imgsampler{
+  width: 300px;
+  height: 230px;
+}
+
+#imgsample {
+  float: left;
+}
+#imgsampler{
+  float: right;
+}
+/*清除左边意味着不让左边有浮动的图片*/
+#clear {
+  clear: left;
+}
+#clearr{
+  clear:right;
+}
+
+@media screen and (max-width: 360px) {
+  img {
+    width: 96%;
+    background: #000;
+  }
+}

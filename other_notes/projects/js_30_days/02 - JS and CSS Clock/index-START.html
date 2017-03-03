@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JS + CSS Clock</title>
+</head>
+<body>
+
+
+    <div class="clock">
+      <div class="clock-face">
+        <div class="hand hour-hand"></div>
+        <div class="hand min-hand"></div>
+        <div class="hand second-hand"></div>
+      </div>
+    </div>
+
+
+  <style>
+    html {
+      background:#018DED url(http://unsplash.it/1500/1000?image=881&blur=50);
+      background-size:cover;/*背景图像尺寸 cover覆盖*/
+      font-family:'helvetica neue';
+      text-align: center;
+      font-size: 10px;
+    }
+
+    body {
+      margin: 0;
+      font-size: 2rem; /*rem相对于根元素字体大小(html)。在rem概念没引入前我们的做法是，以最小的屏幕（iPhone）做一版数据出来，然后通过js去控制
+viewport 的 initial-scale （网页缩放比例）。缺点是：这样做会使得，因为initial-scale越来越大，相当于拉伸网页，而使得在大屏幕的移动端设备下，文字、图片会变模糊。*/
+      display:flex;
+      flex:1;
+      min-height: 100vh;
+      align-items: center;
+    }
+
+    .clock {
+      width: 30rem;
+      height: 30rem;
+      border:20px solid white;
+      border-radius:50%;
+      margin:50px auto;
+      position: relative;
+      padding:2rem;
+      box-shadow:
+        0 0 0 4px rgba(0,0,0,0.1),
+        inset 0 0 0 3px #EFEFEF,
+        inset 0 0 10px black,
+        0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .clock-face {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform: translateY(-3px); /* account for the height of the clock hands */
+    }
+
+    .hand {
+      width:50%;
+      height:6px;
+      background:black;
+      position: absolute;
+      top:50%;
+    }
+
+  </style>
+
+  <script>
+
+
+  </script>
+</body>
+</html>

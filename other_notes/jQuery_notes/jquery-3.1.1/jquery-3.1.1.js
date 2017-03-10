@@ -11,7 +11,7 @@
  *
  * Date: 2016-09-22T22:30Z
  */
-( function( global, factory ) { //global不一定是window
+( function( global, factory ) { //名字是global所以不一定是window
 
 	"use strict";
 
@@ -37,7 +37,7 @@
 	}
 
 // Pass this if window is not defined yet
-} )( typeof window !== "undefined" ? window : this, function( window, noGlobal ) {
+} )( typeof window !== "undefined" ? window : this, function( window, noGlobal ) {//这里做了个保险考虑如果window是undefined的情况,以前会把undefined传入防止其被修改
 
 // Edge <= 12 - 13+, Firefox <=18 - 45+, IE 10 - 11, Safari 5.1 - 9+, iOS 6 - 9.1
 // throw exceptions when non-strict code (e.g., ASP.NET 4.5) accesses strict mode
@@ -100,25 +100,23 @@ var
 
 	// Support: Android <=4.0 only
 	// Make sure we trim BOM and NBSP
-	rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,//全局匹配前后所有空格多次
+	rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,//全局匹配所有空格多次，trim BOM是啥意思
+	// Matches dashed string for camelizing
 	rmsPrefix = /^-ms-/,//匹配 -ms-开头 的有啥用?
 	rdashAlpha = /-([a-z])/g,//匹配 -加小写字母
 
 
 // /^<\.+>$/相当于 if (selector.charAt(0) === "<" && selector.charAt(selector.length - 1) === ">" && selector.length >= 3)
 	// Used by jQuery.camelCase as callback to replace()
-	//转驼峰replace每次匹配的回调函数
 	fcamelCase = function( all, letter ) {
-		//all表示所有匹配到的 如-t, letter表示()里面的 如t
 		return letter.toUpperCase();
 	};
 
-//初次初始化原型
 jQuery.fn = jQuery.prototype = {
 
 	// The current version of jQuery being used
 	jquery: version,
-//重定义prototype的constructor属性(jQuery.fn.init)为jQuery
+
 	constructor: jQuery,//采用对象字面量方法重写了jQuery的prototype如果不加这个会指向Object
 
 	// The default length of a jQuery object is 0
@@ -10179,9 +10177,9 @@ jQuery.parseJSON = JSON.parse;
 // declare themselves as anonymous modules, and avoid setting a global if an
 // AMD loader is present. jQuery is a special case. For more information, see
 // https://github.com/jrburke/requirejs/wiki/Updating-existing-libraries#wiki-anon
-//注册一个命名了的amd，一般匿名,但jQuery经常是其他模块的依赖.并且有名字更安全
+
 if ( typeof define === "function" && define.amd ) {
-	define( "jquery", [], function() { 
+	define( "jquery", [], function() {
 		return jQuery;
 	} );
 }
@@ -10197,7 +10195,7 @@ var
 	// Map over the $ in case of overwrite
 	_$ = window.$;
 
-jQuery.noConflict = function( deep ) {// ?
+jQuery.noConflict = function( deep ) {
 	if ( window.$ === jQuery ) {
 		window.$ = _$;
 	}

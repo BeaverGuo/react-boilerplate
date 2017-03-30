@@ -1,29 +1,53 @@
 {
-  "name": "boilerplate",
+  "name": "webapp-demo",
   "version": "1.0.0",
-  "description": "react boilerplate",
+  "description": "webpack demo",
+  "scripts": {
+    "start": "yarn dev:start",
+    "dev:start": "nodemon -e js,jsx --ignore lib --ignore dist --exec babel-node src/server",
+    "dev:wds": "webpack-dev-server --progress",
+    "prod:build": "rimraf lib dist && babel src -d lib --ignore .test.js && cross-env NODE_ENV=production webpack -p --progress",
+    "prod:start": "cross-env NODE_ENV=production pm2 start lib/server && pm2 logs",
+    "prod:stop": "pm2 delete server"
+  },
   "main": "index.js",
   "repository": {},
-  "author": "Beaver Guo",
+  "author": "Guo",
   "license": "MIT",
-  "scripts": {
-    "start": "gulp"
-  },
-  "devDependencies": {
-    "babel-loader": "^6.2.10",
-    "babel-preset-latest": "^6.22.0",
-    "babel-preset-react": "^6.22.0",
-    "del": "^2.2.2",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
-    "webpack-stream": "^3.2.0"
-  },
   "dependencies": {
-    "babel-polyfill": "^6.22.0",
-    "immutable": "^3.8.1",
+    "babel-polyfill": "^6.23.0",
+    "bootstrap": "4.0.0-alpha.6",
+    "compression": "^1.6.2",
+    "express": "^4.15.2",
+    "immutable": "4.0.0-rc.2",
+    "isomorphic-fetch": "^2.2.1",
+    "jquery": "^3.2.1",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
-    "react-redux": "^5.0.2",
-    "redux": "^3.6.0"
+    "react-helmet": "^5.0.1",
+    "react-hot-loader": "next",
+    "react-jss": "^5.4.0",
+    "react-redux": "^5.0.3",
+    "react-router": "next",
+    "react-router-dom": "next",
+    "redux": "^3.6.0",
+    "redux-actions": "^2.0.1",
+    "redux-thunk": "^2.2.0",
+    "socket.io": "^1.7.3",
+    "socket.io-client": "^1.7.3",
+    "tether": "^1.4.0"
+  },
+  "devDependencies": {
+    "babel-cli": "6.24.0",
+    "babel-core": "6.24.0",
+    "babel-loader": "6.4.1",
+    "babel-preset-env": "1.2.2",
+    "babel-preset-react": "6.23.0",
+    "cross-env": "3.2.4",
+    "nodemon": "1.11.0",
+    "pm2": "2.4.2",
+    "rimraf": "2.6.1",
+    "webpack": "2.3.2",
+    "webpack-dev-server": "2.4.2"
   }
 }

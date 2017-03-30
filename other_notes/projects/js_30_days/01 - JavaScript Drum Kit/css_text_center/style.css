@@ -11,6 +11,23 @@ body {
   height: 260px;
   margin: 10px;
 }
+.container_pure {
+    position: relative;
+  color: white;
+  background: #ffbd17;
+  width: 400px;
+  height: 260px;
+}
+
+.container_margin {
+    position: relative;
+  color: white;
+  background: #ffbd17;
+  width: 400px;
+  height: 260px;
+  margin: 10px;
+}
+
 
 #content {
   background: #06c;
@@ -27,6 +44,27 @@ body {
   background: red;
   max-width: 120px;
   height: 120px;
+}
+#hcenter_margin{
+  margin-left: 50%;
+  background: black;
+  width: 120px;
+  height: 120px;
+}
+
+
+#hcenter_pure {
+    background:black;
+    color: white;
+    border-radius: 1em;
+    padding: 1em;
+    position: absolute;
+    top: 50%;/*相对父元素的50%,执行完top和left之后左上角处于外层div的中心*/
+    left: 50%;
+    transform: translate(-50%, -50%);/*再相对自身移到中心,这里的50%是相对自身的
+                                      */
+    width: 120px;
+    height: 120px;
 }
 
 

@@ -161,3 +161,130 @@ const resolvedBox = {
   ...box,
   children: resolvedChildren
 };
+
+
+
+class DOMComponent {
+  constructor(element) {
+    this.currentElement = element;
+    this.renderedChildren = [];
+    this.node = null;
+  }
+
+  getPublicInstance() {
+    // For DOM components, only expose the DOM node.
+    return this.node;
+  }
+
+  mount() {
+    var element = this.currentElement;
+    var type = element.type;
+    var props = element.props;
+    var children = props.children || [];
+    if (!Array.isArray(children)) {
+      children = [children];
+    }
+
+    // Create and save the node
+    var node = document.createElement(type);
+    this.node = node;
+
+    // Set the attributes
+    Object.keys(props).forEach(propName => {
+      if (propName !== 'children') {
+        node.setAttribute(propName, props[propName]);
+      }
+    });
+
+    // Create and save the contained children.
+    // Each of them can be a DOMComponent or a CompositeComponent,
+    // depending on whether the element type is a string or a function.
+    var renderedChildren = children.map(instantiateComponent);
+    this.renderedChildren = renderedChildren;
+
+    // Collect DOM nodes they return on mount
+    var childNodes = renderedChildren.map(child => child.mount());
+    childNodes.forEach(childNode => node.appendChild(childNode));
+
+    // Return the DOM node as mount result
+    return node;
+  }
+}
+
+/*The main difference after refactoring from mountHost() is that we now keep this.node and
+ this.renderedChildren associated with the internal DOM component instance. We will also 
+ use them for applying non-destructive updates in the future.
+ if a functional <App> component renders a <Button> class component, and Button class renders a <div>, the internal instance tree would look like this:
+
+[object CompositeComponent] {
+  currentElement: <App />,
+  publicInstance: null,
+  renderedComponent: [object CompositeComponent] {
+    currentElement: <Button />,
+    publicInstance: [object Button],
+    renderedComponent: [object DOMComponent] {
+      currentElement: <div />,
+      node: [object HTMLDivElement],
+      renderedChildren: []
+    }
+  }
+}
+
+To complete this refactoring, we will introduce a function that mounts a complete tree into a container node, just like ReactDOM.render(). It returns a public instance, also like ReactDOM.render():
+*/
+function mountTree(element, containerNode) {
+  // Create the top-level internal instance
+  var rootComponent = instantiateComponent(element);
+
+  // Mount the top-level component into the container
+  var node = rootComponent.mount();
+  containerNode.appendChild(node);
+
+  // Return the public instance it provides
+  var publicInstance = rootComponent.getPublicInstance();
+  return publicInstance;
+}
+
+var rootEl = document.getElementById('root');
+mountTree(<App />, rootEl);
+
+class CompositeComponent {
+
+  // ...
+
+  unmount() {
+    // Call the lifecycle hook if necessary
+    var publicInstance = this.publicInstance;
+    if (publicInstance) {
+      if (publicInstance.componentWillUnmount) {
+        publicInstance.componentWillUnmount();
+      }
+    }
+
+    // Unmount the single rendered component
+    var renderedComponent = this.renderedComponent;
+    renderedComponent.unmount();
+  }
+}
+//For DOMComponent, unmounting tells each child to unmount:
+
+class DOMComponent {
+
+  // ...
+
+  unmount() {
+    // Unmount all the children
+    var renderedChildren = this.renderedChildren;
+    renderedChildren.forEach(child => child.unmount());
+  }
+}
+
+/*In practice, unmounting DOM components also removes the event listeners and clears some caches, but we will skip those details.
+
+In the previous section, we implemented unmounting. However React wouldn't be very useful if each prop change unmounted and mounted the whole tree. The goal of the reconciler is to reuse existing instances where possible to preserve the DOM and the state:
+*/
+var rootEl = document.getElementById('root');
+
+mountTree(<App />, rootEl);
+// Should reuse the existing DOM:
+mountTree(<App />, rootEl);

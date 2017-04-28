@@ -259,3 +259,317 @@ setTimeout(function () {
 });
 
 //我们一般的click事件也运用了闭包
+
+
+<!-- START Display Upgrade Message for IE 10 or Less -->
+<!-- [if lte IE 9]>
+<div style="background: #000; text-align: center; position: absolute; top: 0px; width: 100%; color: #FFF;">This website may not be compatible with your outdated Internet Explorer version. <a href="http://windows.microsoft.com/en-us/internet-explorer/download-ie" target="_blank" style="color: #fff; text-decoration: underline;">Please upgrade here.</a></div>
+<![endif]-->
+<script>
+// IF THE BROWSER IS INTERNET EXPLORER 10
+if (navigator.appVersion.indexOf("MSIE 10") !== -1)
+{
+document.write('<div style="background: #000; text-align: center; position: absolute; top: 0px; width: 100%; color: #FFF;">\
+    This website may not be compatible with your outdated Internet Explorer version. <a href="http://windows.microsoft.com/en-us/internet-explorer/download-ie" target="_blank" style="color: #fff; text-decoration: underline;">Please upgrade here.</a></div>');
+}
+// ]]></script>
+<!-- END Display Upgrade Message for IE 10 or Less -->
+
+
+
+
+
+//ie9以下浏览器提示
+(function(){
+  var innerStyle = function(styleText){
+      var styleDom = document.createElement('style');
+          styleDom.type = 'text/css'
+      if( styleDom.styleSheet ){ //ie
+        styleDom.styleSheet.cssText = styleText;
+      }else{
+        styleDom.innerText = styleText;
+      }
+      document.getElementsByTagName('head')[0].appendChild(styleDom);
+  }
+
+  var domReady = function(fn) {
+    var done = false, top = true,
+    doc = window.document,
+    root = doc.documentElement,  //html root
+    modern = doc.addEventListener,
+    add = modern ? 'addEventListener' : 'attachEvent',
+    rem = modern ? 'removeEventListener' : 'detachEvent',
+    pre = modern ? '' : 'on',
+    init = function(e) {
+        if (e.type == 'readystatechange' && doc.readyState != 'complete') return; //complete内嵌资源也加载完了
+        (e.type == 'load' ? window : doc)[rem](pre + e.type, init, false); //全加载完后移除事件绑定释放资源
+        if (!done && (done = true)) fn.call(window, e.type || e); //加载完set index done, call callback function
+    },
+    poll = function() { //利用 doScroll这个特性 去检测 domReady是否完成?是不是没完成就进catch执行出错了?
+        //check to see if the callbacks have been fired already
+        try { root.doScroll('left'); } catch(e) { setTimeout(poll, 50); return; }
+        //there were no errors with the scroll check and the callbacks have not yet fired, so fire them now
+        init('poll'); //这个poll没看懂
+    };
+    if (doc.readyState == 'complete') fn.call(window, 'lazy');
+    else {
+        if (!modern && root.doScroll) {
+            try { top = !window.frameElement; } catch(e) { } //顶层窗口window.frameElement返回null
+            if (top) poll();
+        }
+        doc[add](pre + 'DOMContentLoaded', init, false);
+        doc[add](pre + 'readystatechange', init, false);
+        window[add](pre + 'load', init, false);
+    }
+  }
+
+  var ltie9 = !!(document.all && !document.addEventListener)
+  var styles = '.explorer-tips { position: relative; padding: 8px 20px 10px 48px; color: #666; font-size: 14px; background: #FFEED2; font-family: BlinkMacSystemFont, Helvetica, Arial, Tahoma, "PingFang SC","Hiragino Sans GB","Lantinghei SC","Microsoft YaHei",sans-serif; } .explorer-tips strong { color: #FF9C2D; font-size: 16px; font-weight: bold; } .explorer-tips a { color: #4394FF; border-bottom: 1px solid #4394FF; } .explorer-tips a:hover { text-decoration: none; } .icon-remind { position: absolute; left: 24px; top: 11px; width: 16px; height: 18px; background: url(http://pic.c-ctrip.com/flight/index/icons/icon_remind.png) no-repeat 0 0; } /* mask */ .explorer-mask {z-index: 100; position: fixed; left: 0; top: 0; right: 0; bottom: 0; filter:progid:DXImageTransform.Microsoft.gradient(enabled="true",startColorstr="#B2000000", endColorstr="#B2000000");background:rgba(0,0,0,0.7); } /* explorer-modal */ .explorer-modal, .explorer-modal h3, .explorer-modal h4 { font-weight: normal; font-family: BlinkMacSystemFont, Helvetica, Arial, Tahoma, "PingFang SC","Hiragino Sans GB","Lantinghei SC","Microsoft YaHei",sans-serif; } .explorer-modal h2, .explorer-modal .close { overflow: hidden; line-height: 999em; } .explorer-modal { z-index: 101; position: fixed; left: 50%; top: 50%; margin: -234px 0 0 -272px; width: 543px; height: 468px; background: url(http://pic.c-ctrip.com/flight/index/explorer_modal.png) no-repeat 0 0; } .explorer-modal .modal-header { height: 150px; } .explorer-modal h3 { text-align: center; color: #999; font-size: 16px; font-weight: normal; border-top: 1px solid #e7e7e7; } .explorer-modal h3 span { position: relative; top: -10px; padding: 0 20px; background: #fff; } .explorer-modal .modal-body { padding: 42px 30px 0; height: 224px; } .explorer-modal .QR-code { display: inline-block; /*_display: inline; _zoom: 1;*/ width: 132px; margin: 10px 20px 0 60px; text-align: center; color: #999; } .explorer-modal h4 { margin-top: 5px; } .explorer-modal .modal-bottom { height: 52px; line-height: 52px; color: #666; font-size: 14px; text-align: center; } .explorer-modal .link { margin-left: 15px; color: #4394FF; border-bottom: 1px solid #4394FF; } .explorer-modal .link:hover { text-decoration: none; } .explorer-modal .close { position: absolute; top: 16px; right: 16px; width: 30px; height: 30px; cursor: pointer; }'
+  var tipstop = '<div class="explorer-tips"> <i class="icon-remind"></i> 您当前的浏览器版本过低，可能有<strong>安全风险</strong>，您可以手机下载APP或升级浏览器，<a href="javascript:;">查看详情</a></div>'
+  var modals = '<div class="explorer-mask"></div>\
+                <div class="explorer-modal">\
+                    <div class="modal-header"><h2>您当前的浏览器版本过低，可能有<span>安全风险！</span></h2></div>\
+                    <div class="modal-body">\
+                        <h3><span>您可以手机扫码搜索机票</span></h3>\
+                        <div class="QR-box">\
+                            <div class="QR-code"><img src="http://pic.c-ctrip.com/flight/index/QR_h5.png" alt=""><h4>手机网页版</h4></div>\
+                            <div class="QR-code"><img src="http://pic.c-ctrip.com/flight/index/QR_app.png" alt=""><h4>携程旅行APP</h4></div>\
+                        </div>\
+                    </div>\
+                    <div class="modal-bottom">或升级浏览器<a href="https://www.google.com/chrome/browser/desktop/" class="link" target="_blank">谷歌浏览器</a><a href="http://www.firefox.com.cn/" class="link" target="_blank">火狐浏览器</a></div>\
+                    <div class="close">×</div>\
+              </div>'
+
+  domReady(function(){
+    if(ltie9){
+      innerStyle(styles);
+      document.body.insertAdjacentHTML('afterbegin', tipstop);
+      document.body.insertAdjacentHTML('beforeend', modals);
+      var toggleModal = function(toggle){
+        var toggleEle = toggle?'show':'hide'
+        cQuery('.explorer-mask')[toggleEle](); cQuery('.explorer-modal')[toggleEle]()
+      }
+      cQuery('.explorer-tips a').bind('click', function(){ toggleModal(1) })
+      cQuery('.explorer-modal .close').bind('click', function(){ toggleModal(0) })
+    }
+  })
+})()
+
+/*
+IE: Parse the index page -> Resolve iframe page -> Trigger the DOMContentLoaded event of the iframe ->
+Trigger the iframe page onload event -> Trigger the DOMContentLoaded event of the Index page -> Trigger the
+index page Of the onload event.
+
+-> Trigger the DOMContentLoaded event of the page -> Trigger the iframe’s onload event -> Trigger the 
+iframe’s onload event -> Trigger the iframe’s onload event – > The onload event for the index page.
+
+From this process, we can see IE, you must wait for the current page iframe load analysis is completed, the
+ current page to load analysis is completed, and in non-IE, iframe loading and parsing of the current page to
+  make more asynchronous implementation .
+*/
+
+//dom ready function
+(function(win){
+
+  'use strict';
+
+  var document = win.document,
+    readList = [],    //  Function stack that is waiting to be executed 
+    flag = false;
+
+  var removeEvent = function(){
+
+    if(document.addEventListenner){
+      window.removeEventListenner('load',handle,false);
+    }else if(document.attachEvent){
+      window.detachEvent('onload',handle)
+      document.detachEvent('onreadystatechange',readyState);
+    }else{
+      window.onload = null;
+    }
+
+  },
+  handle = function(){
+
+    if(!flag){
+      
+      while(readList.length){  
+        readList[0].call();  // Executive function 
+        readList.shift();  // Delete the first array element 
+      }
+      flag = true;
+      removeEvent();
+    }
+
+  },
+  readyState = function(){
+    if(document.readyState == 'complete'){
+      handle();
+    }  
+  },
+  DOMContentloaded=function(){
+
+    if(document.readyState == 'complete'){
+      setTimeout(handle);  // setTimeout  Will use the shortest time ， The time is not the same as different systems 。
+    }else if(document.addEventListenner){
+      document.addEventListenner('DOMContentLoaded',fn,false);
+      window.addEventListenner('load',handle,false);
+    }else if(document.attachEvent){
+      window.attachEvent('onload',handle);
+      document.attachEvent('onreadystatechange',readyState);  //onreadystatechange  The event is contained in the page iframe At the time of ， It will wait iframe Load will trigger 。
+      
+      if(self === self.top){  //  When the page is not in iframe In this way detection doScroll Method is available 。 If again iframe In the use of onreadstatechange Events to judge 。
+        (function(){
+          try{
+            document.documentElement.doScroll('left');
+          }catch(e){
+            setTimeout(arguments.callee,50);  //arguments.callee  Is a reference to the current function 。
+            return ;
+          }
+          handle();
+        }());
+      }
+
+    }else{
+      window.onload = handle;
+    }
+  },
+  ready = function(fn){
+    readList.push(fn);  //  Add in the stack to be processed 。
+    DOMContentloaded();
+  };
+
+  win.domReady = ready;
+
+
+}(window));
+
+
+// If IE and not a frame
+            // continually check to see if the document is ready
+            var top = false;
+
+            try {
+                top = window.frameElement == null && document.documentElement;
+            } catch ( e ) {}
+
+            if ( top && top.doScroll ) {
+                (function doScrollCheck() {
+                    if ( !jQuery.isReady ) {
+
+                        try {
+                            // Use the trick by Diego Perini
+                            // http://javascript.nwbox.com/IEContentLoaded/
+                            // throws errors until after ondocumentready
+                            top.doScroll("left");
+                        } catch ( e ) {
+                            return setTimeout( doScrollCheck, 50 );
+                        }
+
+                        // detach all dom ready events
+                        detach();
+
+                        // and execute any waiting functions
+                        jQuery.ready();
+                    }
+                })();
+            }
+
+
+
+//mixin
+
+var regs = {
+    //判断是日期 (yyyy-mm-dd)的格式
+    isDate: /^(\d{4})-(\d{1,2})-(\d{1,2})$/,
+    //判断是时间 (yyyy-mm-dd h:m:s.ms)的格式
+    isDateTime: /^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$/,
+    toDate: /^(\d{4})-(\d{1,2})-(\d{1,2})( \d{1,2}:\d{1,2}:\d{1,2}(\.\d+)?)?$/,
+    toDateTime: /^(\d{4})-(\d{1,2})-(\d{1,2})( (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?)?$/,
+    toFormatString: /([yMdhmsS])\1*/g  //\1*表示重复第一个捕获组多次
+};
+cFly.mix(Date.prototype, {
+
+/**
+ * @method toFormatString
+ * 生成需要的格式的日期字符串
+ * @param {string} 格式　例如(yyyy-mm-dd)
+ * @return {string} 返回特定格式的日期字符串
+ */
+toFormatString: function(fmt) {
+    var h = {
+        'y': this.getFullYear(),
+        'M': this.getMonth() + 1,
+        'd': this.getDate(),
+        'h': this.getHours(),
+        'm': this.getMinutes(),
+        's': this.getSeconds(),
+        'S': this.getMilliseconds()
+    };
+    var minL = { 'y': 2 };
+    for (var name in h) {
+        if (h.hasOwnProperty(name) && !(name in minL))
+            minL[name] = h[name].toString().length;
+    }
+    return fmt.replace(regs.toFormatString, function(a, b) {
+        var t = h[b];
+        var l = Math.max(a.length, minL[b]);//匹配到的和h中取到的取最大长度,不够用join的方式补0
+        var arr = [];
+        arr[l] = '';
+        return (arr.join("0") + t).slice(-l);
+    });
+}
+
+}
+
+
+
+/**
+ * 获取正在执行代码的script标签
+ * @returns {*|{ID, TAG, NAME, CLASS}}
+ */
+function getInteractiveScript() {
+    return cFly.util.find(getScripts(), function(el) {
+        return el.readystate === "interactive";
+    });
+}
+
+/**
+ * 枚举对象属性
+ * @param {Object} obj 待遍历的对象
+ * @param {Function} func 调用函数，return true将跳出循环
+ * @param context func执行上下文，不指定，默认为value
+ */
+eachProp: function(obj, func, context) {
+    if (!obj) {
+        return;
+    }
+    for (var key in obj) {
+        if (hasProp(obj, key)) {
+            if (func.call(context || obj[key], obj[key], key)) {
+                break; //return true跳出
+            }
+        }
+    }
+},
+
+
+/**
+ * 删除前后字符串
+ * @param value 要trim的字符串
+ * @param chars 去除前后字符串
+ */
+function _trim(value, chars) {
+    var reg = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
+    if (chars != null) {
+        chars = chars.replace(/[\.\*\?\+\\\[\]\(\)\^\$\|]/g, function($0) {
+            var ret = '';
+            for (var i = 0, len = $0.length; i < len; i++) {
+                ret += "\\" + $0[i];
+            }
+            return ret;
+        });
+        reg = new RegExp('^(' + chars + ')+|(' + chars + ')+$', 'g');
+    }
+    return value == null ? "" : (value + "").replace(reg, "");
+}

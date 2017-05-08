@@ -573,3 +573,32 @@ function _trim(value, chars) {
     }
     return value == null ? "" : (value + "").replace(reg, "");
 }
+
+
+
+
+//js sleep
+
+async function sleep (dur) {
+    return new Promise((res, rej) => {
+        setTimeout(() => res(), dur);
+    });
+}
+
+async (function yay() {
+    console.log('i am sleepy');
+    await sleep(500);
+    console.log('sleep more');
+    await sleep(1000);
+    console.log('all rested');
+})()
+
+// will go through the whole array no matter what
+function findTheNumberFour(arr) {
+    arr.forEach(x => {
+        if(x === 4) {
+            console.log('found it!')
+            return
+        }
+    })
+}

@@ -35,6 +35,8 @@ const composeEnhancers = (isProd ? null : window.__REDUX_DEVTOOLS_EXTENSION_COMP
 //server-side rendering
 const preloadedState = window.__PRELOADED_STATE__
 
+//Here we pass redux-thunk to Redux's applyMiddleware function. In order for the Redux Devtools
+//to keep working, we also need to use Redux's compose function. 
 const store = createStore(combineReducers({ hello: helloReducer }),
     { hello: Immutable.fromJS(preloadedState.hello) },
     composeEnhancers(applyMiddleware(thunkMiddleware))
@@ -46,6 +48,7 @@ jssServerSide.parentNode.removeChild(jssServerSide)
 
 const rootEl = document.querySelector(APP_CONTAINER_SELECTOR)
 
+//make our App a child of react-hot-loader's AppContainer
 const wrapApp = (AppComponent, reduxStore) =>
     <Provider store={reduxStore}>
         <BrowserRouter>
@@ -56,7 +59,7 @@ const wrapApp = (AppComponent, reduxStore) =>
     </Provider>
 
 ReactDOM.render(wrapApp(App, store), rootEl)
-
+//require the next version of our App when hot-reloading
 if(module.hot) {
     module.hot.accept('../shared/app', () => {
         const NextApp = require('../shared/app').default

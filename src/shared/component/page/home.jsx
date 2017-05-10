@@ -46,7 +46,7 @@ const HomePage = ({ classes }) =>
           <h3 className="mb-3">JSS (soon)</h3>
         </div>
         <div className="col-md-4 mb-4">
-          <h3 className="mb-3">Websocketscc</h3>
+          <h3 className="mb-3">Websocket</h3>
           <p>Open your browser console.</p>
         </div>
 

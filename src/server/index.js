@@ -16,6 +16,7 @@ const io = socketIO(http)
 //Websocket details in setUpSocket
 setUpSocket(io)
 
+//compression middleware activate Gzip compression on the server
 app.use(compression())
 app.use(STATIC_PATH, express.static('dist'))
 app.use(STATIC_PATH, express.static('public'))

@@ -24,6 +24,8 @@ const renderApp = (location, plainPartialState, routerContext = {}) => {
             </StaticRouter>
         </Provider>
     )
+    // React Helmet: A library to inject content to the head of a React app,
+    // on both the client and the server.
     const head = Helmet.rewind()
     return (
        `<!doctype html>
@@ -35,7 +37,7 @@ const renderApp = (location, plainPartialState, routerContext = {}) => {
             <style class="${JSS_SSR_CLASS}">${sheets.toString()}</style>
         </head>
         <body>
-            <div class="${APP_CONTAINER_CLASS}">{appHtml}</div>
+            <div class="${APP_CONTAINER_CLASS}">${appHtml}</div>
             <script>
                 window.__PRELOADED_STATE__ = ${JSON.stringify(store.getState())}
             </script>

@@ -749,3 +749,234 @@ Promise.all(pArr).then((nUsed)=>{
   console.log("tmpArr",tmpArr,nUsed);
   this.setState({dataSource:tmpArr});    
 });
+
+
+//test function0
+//multi assignment
+let obj1 = {
+    a: 1
+};
+
+obj1.b = obj1 = { c:3 };
+
+console.log(obj1={c:3});
+
+console.log(obj1, obj1.b);//{ c:3 } undefined
+
+let obj2 = {
+    b: 2
+};
+
+obj2.c = obj2;
+
+console.log(obj2, obj2.c);//{ b:2 c:[Circular] } { b:2 c:[Circular] }
+
+
+
+
+//test function1
+//closure. decaration lookup at function scope.
+var a = 10;
+(function(a){
+    console.log(a); // output [Function a] . Cause the later declared function overwrite 
+                    //the first decaration.
+    var a = 100;
+    function a(){
+        console.log('a');
+    }
+})(a)
+
+
+//test function3
+//decaration host
+var b = 42;
+
+(function(){
+    console.log(b, typeof b, typeof c, c()); // undefined 'undefined' 'function' undefined
+    var b = "b";
+    function c(){ console.log('c') }
+})()
+
+//call, apply and bind
+//bind return a function.
+
+
+//test function4
+//js stack memory
+
+
+//test function5
+//judge type of Array. instance of Array or .prototype.constructor can also help.
+
+var array5 = [1,2,3];
+
+function isArray(arr) {
+    if(Array.isArray) {
+        return Array.isArray(arr);
+    }
+    if(Object.prototype.toString.call(arr) == '[object Array]') {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+//test function6
+//this binding
+var f6 = 'f6';
+
+function fn(){
+    console.log(this.f6);
+}
+var obj_f6 = {
+    f6: 'f6_obj',
+    method6: function( fn ) {
+        fn(); // 'f6' this refers to global
+        arguments[0](); //arguments[0] is function fn, but this did not call fn, just return [function] the arguments object.
+    }
+}
+
+obj_f6.method6(fn);
+
+
+//prototype
+
+var proto = {
+    hello: function() {
+        return 'Hello, my name is ' + this.name;
+    }
+};
+
+var george = Object.create(proto);
+george.name = 'George';
+
+//mixin style
+var proto = {
+    hello: function hello() {
+        return 'hello, my name is ' + this.name;
+    }
+};
+
+var george = _.extend({}, proto, {name: 'George'});
+
+
+//anything can emit backbone events
+
+var foo = _.extend({
+    attrs: {},
+    set: function (name, value) {
+        this.attrs[name] = value;
+        this.trigger('change', {
+            name: name,
+            value: value
+        });
+    },
+    get: function(name, value) {
+        return this.attrs[name];
+    }
+}, Backbone.Events);
+
+//A simple model implementation
+
+var model = function () {
+    var attr = {};
+
+    this.set = function(name, value) {
+        attrs[name] = value;
+        this.trigger('change', {
+            name: name,
+            value: value
+        });
+    };
+
+    this.get = function(name, value) {
+        return attrs[name];
+    };
+
+    _.extend(this, Backbone.Events);
+};
+
+//composition
+
+const barker = (state) => ({
+    bark: () => console.log('Woof, I am ' + state.name)
+})
+
+const driver = (state) => ({
+    drive: () => state.position = state.position + state.speed
+})
+
+barker({name: 'karo'}).bark() //Woof, I am karo
+
+
+const murderRobotDog = (name) => {
+    let state = {
+        name,
+        speed: 100,
+        position: 0
+    }
+
+    return Object.assign(
+        {},
+        barker(state),
+        driver(state),
+        killer(state)
+    )
+}
+
+console.log('hi')
+setTimeout(function(){
+    console.log('there');
+}, 5000)
+
+//stack push console.log('hi') pop and execute it push setTimeout and pop and 5s later
+//push console.log('there')
+
+//asynchronous forEach
+//mock render
+//synchronous
+[1,2,3,4].forEach(function(i){
+    console.log('processing sync')
+    delay();//这里会block render queue即不能render
+});
+
+//asynchronous
+function asyncForEach(array, cb) {
+    array.forEach(function(){
+        setTimeout(cb, 0);
+    })
+}
+
+asyncForEach([1,2,3,4], function() {//这个不会
+    console.log('processing async', i);
+    delay();
+})
+
+
+
+let animal = {
+  animalType: 'animal',
+ 
+  describe () {
+    return `An ${this.animalType} with ${this.furColor} fur, 
+      ${this.legs} legs, and a ${this.tail} tail.`;
+  }
+};
+ 
+let mouseFactory = function mouseFactory () {
+  let secret = 'secret agent';
+
+  return Object.assign(Object.create(animal), {
+    animalType: 'mouse',
+    furColor: 'brown',
+    legs: 4,
+    tail: 'long, skinny',
+    profession () {
+      return secret;
+    }
+  });
+};
+ 
+let james = mouseFactory();
+

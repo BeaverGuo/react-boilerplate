@@ -348,6 +348,74 @@ class App extends React.Component {
 
 export default App;
 
+//about redux saga going to solve
+<Clock 
+    onStartClick={dispatch(startTimer())}
+/>
+<Timer 
+    onStopClick={dispatch(showTime())}
+/>
+
+//开始计数启动定时，停止计数显示时间
+//这两个组件耦合，不能复用
+<Clock 
+    onStartClick={dispatch(startClicked())}
+/>
+<Timer 
+    onStopClick={dispatch(stopClicked())}
+/>
+
+
+function *connectClockToTimer() {
+  while(true) {
+    yield take(START_BUTTON_CLICKED)
+    put(startTimer())
+    yield take(STOP_BUTTON_CLICKED)
+    put(stopTimer())
+    put(showTimeOnClock())
+  }
+}
+
+decoupled components
+
+1.Containners and components
+2.Group files by feature
+3.Isolate Styling
+4.Use redux-saga
+
+
+4.performance
+
+webpack
+code splitting
+shouldComponentUpdate(nextProps) {
+  return this.props !== nextProps  
+}
+
+ImmutableJS
+cheaply compare object deeply
+compare hash
+
+React Router:
+
+<Router /> sets up your routes. Check out routes.js to see how route paths are mapped with application containers.
+
+Path "/" corresponds to container <HomePage />
+Path "/features" corresponds to container <FeaturePage />
+Path "*" i.e. all other paths correspond to the <NotFoundPage /> (i.e. the 404 page)
+These containers, along with their corresponding reducer and sagas, are loaded asynchronously with the help of dynamic import(). Whenever webpack encounters import() in the code, it creates a separate file for those imports. That means for every route, there will be a separate file. And by corollary, only those javascript files will be downloaded by the browser which are required for the current route.
+
+When you navigate to "/", only files related to the Homepage will be downloaded and subsequently executed. This makes your application incredibly lightweight and lightning fast.
+The mental model is that a saga is like a separate thread in your application that's solely responsible for side effects. redux-saga is a redux middleware, which means this thread can be started, paused and cancelled from the main application with normal redux actions, it has access to the full redux application state and it can dispatch redux actions as well.
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,0 +1,32 @@
+
+.button-wrapper {
+    width: 100%;
+    text-align: left;
+    margin: 4em 0;
+}
+
+.button {
+    display: inline-block;
+    box-sizing: border-box;
+    padding: 0.25em 2em;
+    margin: 0;
+    border: 0;
+    text-decoration: none;
+    border-radius: 4px;
+    -webkit-font-smoothing: antialiased;
+    -webkit-touch-callout: none;
+    user-select: none;
+    cursor: pointer;
+    outline: 0;
+    font-family: 'helvetica neue', helvetica, arial, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #fff;
+    border: 2px solid #41addd;
+    color: #41addd;
+}
+
+.button:active {
+    background: #41addd;
+    color: #fff;
+}

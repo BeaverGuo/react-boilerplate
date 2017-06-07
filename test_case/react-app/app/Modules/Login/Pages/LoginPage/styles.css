@@ -1,0 +1,90 @@
+.login{
+	position:fixed;
+	top:0;
+	left:0;
+	width: 100%;
+	height: 100%;
+	background-position: top center;
+	z-index: 99;
+}
+.systemTitle{
+	position: absolute;
+	width: 192px;
+	height: 107px;
+	top: 32%;
+	left: 50%;
+	background: url(../../Images/logo.png);
+	margin: -100px 0 0 -150px;
+}
+.loginBox{
+	width: 410px;
+	height: 330px;
+	position: absolute;
+	left: 50%;
+	margin-left: -250px;
+	top: 28%;
+	padding: 80px 0 0 0;
+	text-align: center;
+}
+.loginBox label{
+	color: white;
+	font-size: 18px;
+	font-family: "微软雅黑", "Microsoft YaHei";
+	line-height: 30px;
+	font-weight: normal;
+	margin: 0 10px 0 0;
+	display:inline-block;
+}
+
+.loginBox input{
+	width: 265px;
+	height: 35px;
+	margin: 0 0 10px 0;
+	padding: 5px;
+	border: 1px solid #ccc;
+	font-size: 16px;
+	font-family: "微软雅黑", "Microsoft YaHei";
+	background: white;
+	border: 1px solid #aaa;
+}
+
+.loginBox input:focus{
+	box-shadow: 0 0 10px #5581ba;
+}
+
+.loginBox label{
+	width: 265px;
+	height: 35px;
+	line-height:20px;
+	margin: -20px 0 0 0;
+	text-align: left;
+	color: #5A7B9A;
+	font-size: 14px;
+}
+
+.loginBox input[type=password]{
+	margin: 0 0 10px 0;
+}
+
+.loginBox input[type=checkbox]{
+	width: auto;
+	height: auto;
+	margin: 0;
+}
+
+.loginBox button{
+	width: 265px;
+	height: 35px;
+	font-size: 16px;
+	font-family: "微软雅黑", "Microsoft YaHei";
+	background: #3bb165;
+	color: white;
+	border: none;
+} 
+
+.loginBox .error{
+	width: 265px;
+	height: 35px;
+	color: #FF0000;
+	text-align: center;
+}

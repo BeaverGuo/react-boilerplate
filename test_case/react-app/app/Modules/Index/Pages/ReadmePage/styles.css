@@ -1,0 +1,13 @@
+.route-body {
+    padding-top: 60px;
+    margin-top: 0;
+}
+
+.row-container {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.row-2 {
+    font-size: 26px;
+}

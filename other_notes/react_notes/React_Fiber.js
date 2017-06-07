@@ -349,6 +349,49 @@ class App extends React.Component {
 export default App;
 
 
+//function composition
+
+const toSlug = input => encodeURIComponent(
+  input.split(' ')
+    .map(str => str.toLowerCase())
+    .join('-')
+)
 
 
+//改成可读性差的函数组合
+
+const toSlug = input => encodeURIComponent(
+  join('-')(
+    map(toLowerCase)(
+      split(' ')(
+        input
+      )
+    )
+  )
+)
+
+
+//take the output from one function and automatically patch it to the input of the next function until it spits out the final value.
+//Come to think of it, we have an array extras utility that sounds like it does something like that. It takes a list of values and applies a function to each of those values, accumulating a single result. The values themselves can be functions. The function is called `reduce()`, but to match the compose behavior above, we need it to reduce right to left, instead of left to right.
+
+const compose = (...fns) => x => fns.reduceRight((v, f) => f(v), x)
+
+const toSlug = compose(
+  encodeURIComponent,
+  join('-'),
+  map(toLowerCase),
+  split(' ')
+)
+
+
+
+//eg 对fns中每个函数应用上个函数返回的结果v
+const pipe = (...fns) => x => fns.reduce((v, f) => f(v), x)
+
+const fn1 = s => s.toLowerCase()
+const fn2 = s => s.split('').reverse().join('')
+const fn3 = s => s + '!'
+
+const newFunc = pipe(fn1, fn2, fn3)
+const result = newFunc('Time') // emit!
 

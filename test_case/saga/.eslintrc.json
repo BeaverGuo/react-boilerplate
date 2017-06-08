@@ -7,12 +7,14 @@
     "flowtype",
     "compat"
   ],
+  "env": {
+    "browser": true,
+    "jest": true
+  },
   "rules": {
     "semi": [2, "never"],
     "no-unexpected-multiline": 2,
-    "compat/compat": 2
-  },
-  "env": {
-    "jest": true
+    "compat/compat": 2,
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }]
   }
 }

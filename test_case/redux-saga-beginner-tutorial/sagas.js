@@ -27,9 +27,10 @@ export function* helloSaga() {
 }
 
 // single entry point to start all Sagas at once
+// yields an array with results of calling our two sagas
 export default function* rootSaga() {
   yield all([ //the two resulting Generators will be started in parallel.
-    helloSaga(),
+    helloSaga(), // helloSaga will be called first page load cause sagaMiddleware.run(rootSaga) ?
     watchIncrementAsync()
   ])
 }

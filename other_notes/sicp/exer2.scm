@@ -35,3 +35,30 @@
 
 ;The easiest way to spot that the first process is recursive (without writing out the substitution) is to note that the "+" procedure calls itself at the end while nested in another expression; the second calls itself, but as the top expression.
 
+; 1.11 star
+; recursive:
+(define f (n)
+  if(< n 3)
+    n
+  else
+    (+ f (- n 1) f (- n 2) f(- n 3)))
+; iterative: wrong
+
+(define (f n)
+  (cond ((< n 3) n)
+    (else (+ (f (- n 1))
+      (* 2 (f (- n 2)))
+      (* 3 (f (- n 3)))))))
+;iterative
+
+(define (f n)
+  (define (iter a b c count)
+    (if (= count 0)
+      a
+      (iter b c (+ c (* 2 b) (* 3 a)) (- count 1)))) ;; ? b c already computed and the last is the new. eg: 0 1 2 --> 1 2 4 ?
+  (iter 0 1 2 n))
+
+;; get the relationship between f(n+1) and f(n)
+; f(n+1) = f(n) + 2f(n-1) + 3f(n-2)    --> ? c b  and ? is below
+; f(n)   = f(n-1) + 2f(n-2) + 3f(n-3)  --> c b a  ? is f(n) = c+2b+3a
+

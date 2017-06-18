@@ -254,3 +254,79 @@ function* fetchPostsWithTimeout() {
   else
     put({type: 'TIMEOUT_ERROR'})
 }
+
+//generator
+function* sum() {
+  var x = 0
+  x += (yield "1st " + x)
+  x += (yield "2nd " + x)
+  x += (yield "3rd " + x)
+  x += (yield "4th " + x)
+}
+
+var it = sum()
+console.log(it.next('unused')) //1st 0  x = 0 + 1 get 1 from next(1) 
+console.log(it.next(1)) //2nd 1 x = 1 + 2 
+console.log(it.next(2))
+console.log(it.next(3))
+
+//passing values to generator
+function* sum() {
+  var x = 0
+  while( true ) {
+    x += yield x
+  }
+}
+var it = sum()
+console.log(it.next('unused')) // 0
+console.log(it.next(1)) // 1 
+console.log(it.next(2)) // 3
+console.log(it.next(3)) // 6
+
+//make it iterable
+
+var myIterable = {}
+myIterable[Symbol.iterator] = function* () {
+  yield 1
+  yield 2
+  yield 3
+}
+
+for (let value of myIterable) {
+  console.log(value) //1 2 3
+}
+
+
+[...myIterable] //[1 2 3]
+
+//with async code (+promises)
+
+const fetchUser = () => new Promise (
+  resolve => {
+    setTimeout( () => resolve (
+      {
+        username: 'Joe',
+        hash: '12345'
+      }
+    ), 4000)
+  }
+)
+
+function* apiCalls(username, password) {
+  var user = yield fetchUser(username)
+  return user
+}
+
+var it = apiCalls()
+
+var promise = it.next().value
+console.log(promise)
+
+promise.then((result) => {
+  console.log(result)
+  var response = it.next(result)
+  console.log(response)
+})
+
+
+

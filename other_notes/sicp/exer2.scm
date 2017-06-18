@@ -1,64 +1,72 @@
-;1.10 star
-; both recursive wrong!!
-(+ 4 5)
-; the second is iterative!!
+;2.1
+(define (make-rat n d)
+  (let ((g (gcd n d)))
+    (cons (/ n g) (/ d g))))
+; my answer:
+(define (make-rat n d)
+  (cond ((and (< n 0) (< d 0)) (define n -n) (define d -d))
+        ((< d 0) (define n -n) (define d -d)))
+  (let ((g (gcd n d)))
+    (cons (/ n g) (/ d g))))
 
-; the first
- (+ 4 5) 
- (inc (+ (dec 4) 5)) 
- (inc (+ 3 5)) 
- (inc (inc (+ (dec 3) 5))) 
- (inc (inc (+ 2 5))) 
- (inc (inc (inc (+ (dec 2) 5)))) 
- (inc (inc (inc (+ 1 5)))) 
- (inc (inc (inc (inc (+ (dec 1) 5))))) 
- (inc (inc (inc (inc (+ 0 5))))) 
- (inc (inc (inc (inc 5)))) 
- (inc (inc (inc 6))) 
- (inc (inc 7)) 
- (inc 8) 
+
+; answer
+ (define (numer x) (car x)) 
   
- 9 
-
- ; the second
-  (+ 4 5) 
- (+ (dec 4) (inc 5)) 
- (+ 3 6) 
- (+ (dec 3) (inc 6)) 
- (+ 2 7) 
- (+ (dec 2) (inc 7)) 
- (+ 1 8) 
- (+ (dec 1) (inc 8)) 
- (+ 0 9) 
+ (define (denom x) (cdr x)) 
   
- 9
+ (define (print-rat x) 
+   (newline) 
+   (display (numer x)) 
+   (display "/") 
+   (display (denom x))) 
+  
+(define (make-rat n d)
+  (let ((g ((if (< d 0) - +) (abs (gcd n d)))))
+    (cons (/ n g) (/ d g))))
 
-;The easiest way to spot that the first process is recursive (without writing out the substitution) is to note that the "+" procedure calls itself at the end while nested in another expression; the second calls itself, but as the top expression.
+; 2.2 abstraction
+(define (make-point x y)
+  cons (x y))
+(define (point-x x)
+  (car x))
+(define (point-y x)
+  (cdr x))
 
-; 1.11 star
-; recursive:
-(define f (n)
-  if(< n 3)
-    n
-  else
-    (+ f (- n 1) f (- n 2) f(- n 3)))
-; iterative: wrong
+(define (make-segment x y)
+  cons(x y))
+(define (start-segment x)
+  (car x))
+(define (end-segment x)
+  (cdr x))
 
-(define (f n)
-  (cond ((< n 3) n)
-    (else (+ (f (- n 1))
-      (* 2 (f (- n 2)))
-      (* 3 (f (- n 3)))))))
-;iterative
+; answer
+ ;; Point 
+ (define (make-point x y) (cons x y)) 
+ (define (x-point p) (car p)) 
+ (define (y-point p) (cdr p)) 
+ (define (print-point p) 
+   (newline) 
+   (display "(") 
+   (display (x-point p)) 
+   (display ",") 
+   (display (y-point p)) 
+   (display ")")) 
+  
+ ;; Segment 
+ (define (make-segment start-point end-point) 
+   (cons start-point end-point)) 
+ (define (start-segment segment) (car segment)) 
+ (define (end-segment segment) (cdr segment)) 
+  
+ (define (midpoint-segment segment) 
+   (define (average a b) (/ (+ a b) 2.0)) 
+   (let ((a (start-segment segment)) 
+         (b (end-segment segment))) 
+     (make-point (average (x-point a) 
+                          (x-point b)) 
+                 (average (y-point a) 
+                          (y-point b)))))
 
-(define (f n)
-  (define (iter a b c count)
-    (if (= count 0)
-      a
-      (iter b c (+ c (* 2 b) (* 3 a)) (- count 1)))) ;; ? b c already computed and the last is the new. eg: 0 1 2 --> 1 2 4 ?
-  (iter 0 1 2 n))
 
-;; get the relationship between f(n+1) and f(n)
-; f(n+1) = f(n) + 2f(n-1) + 3f(n-2)    --> ? c b  and ? is below
-; f(n)   = f(n-1) + 2f(n-2) + 3f(n-3)  --> c b a  ? is f(n) = c+2b+3a
 

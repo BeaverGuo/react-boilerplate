@@ -88,3 +88,58 @@ This describes a perfectly legitimate mathematical function. We could use it to 
 This only begs the question.
 
 The contrast between function and procedure is a reflection of the general distinction between describing properties of things and describing how to do things, or, as it is sometimes referred to, the distinction between declarative knowledge and imperative knowledge.
+
+scheme:
+EDIT: In this manual:
+
+	* http://www.gnu.org/software/mit-scheme/documentation/mit-scheme-user.pdf
+
+section 7.5, it says:
+When Edwin starts, it has one buffer: a REPL buffer called ‘*scheme*’. The command M-x replselects this buffer, if it exists; otherwise it creates a new REPL buffer. If you want two REPL buffers, just rename the ‘*scheme*’ buffer to something else and run M-x repl again.
+You can use the following also (see section 7.4 from the manual):
+
+	* C-x C-e - evaluate s-exp before the cursor
+	* M-z - evaluate the whole definition containing the cursor
+	* M-: - evaluate from mini-buffer
+	* C-M-z - evaluate the whole region
+	* M-o - evaluate the whole buffer
+
+(C stands for Ctrl, M for Alt on PC keyboards).
+Never used it, but from this:
+
+	* http://www.cs.rpi.edu/academics/courses/fall99/ai/scheme/scheme.html
+
+you should be able to get the prompt by M-x run-scheme (M-x stand for Alt-X on today's keyboards).
+After installing and running the MIT-GNU Scheme from the Start menu, you get two windows, Edwin *scheme* and MIT/GNU Scheme. Go to the second window and press Ctrl+U. You should get the 1 ]=> prompt right away.
+
+sicp pdf:
+https://github.com/sarabander/sicp-pdf
+
+The contrast between function and procedure is a reflection of the general distinction between describing properties of things and describing how to do things, or, as it is sometimes referred to, the distinction between declarative knowledge and imperative knowledge.
+
+we noted that Scheme is an applicative-order language, namely, that all the arguments to Scheme procedures are evaluated when the procedure is applied. In contrast, normal-order languages delay evaluation of procedure arguments until the actual argument values are needed. Delaying evaluation of procedure arguments until the last possible moment (e.g., until they are required by a primitive operation) is called lazy evaluation.
+
+Consider the procedure
+
+(define (try a b)
+  (if (= a 0) 1 b))
+
+Evaluating (try 0 (/ 1 0)) generates an error in Scheme. With lazy evaluation, there would be no error. Evaluating the expression would return 1, because the argument (/ 1 0) would never be evaluated.
+
+An example that exploits lazy evaluation is the definition of a procedure unless
+
+(define (unless condition usual-value exceptional-value)
+  (if condition exceptional-value usual-value))
+
+that can be used in expressions such as
+(unless (= b 0)
+        (/ a b)
+        (begin (display "exception: returning 0")
+               0))
+
+This won't work in an applicative-order language because both the usual value and the exceptional value will be evaluated before unless is called
+
+Such nesting of definitions, called block structure, is basically the right solution to the simplest name-packaging problem. But there is a better idea lurking here. In addition to internalizing the definitions of the auxiliary procedures, we can simplify them. Since x is bound in the definition of sqrt, the proceduresgood-enough?, improve, and sqrt-iter, which are defined internally to sqrt, are in the scope of x. Thus, it is not necessary to pass x explicitly to each of these procedures. Instead, we allow x to be a free variable in the internal definitions, as shown below. Then x gets its value from the argument with which the enclosing procedure sqrt is called. This discipline is called lexical scoping.
+
+iteration and recursion
+n the iterative case, the program variables provide a complete description of the state of the process at any point. If we stopped the computation between steps, all we would need to do to resume the computation is to supply the interpreter with the values of the three program variables. Not so with the recursive process. In this case there is some additional ``hidden'' information, maintained by the interpreter and not contained in the program variables, which indicates ``where the process is'' in negotiating the chain of deferred operations. The longer the chain, the more information must be maintained.

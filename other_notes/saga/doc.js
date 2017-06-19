@@ -319,12 +319,12 @@ function* apiCalls(username, password) {
 
 var it = apiCalls()
 
-var promise = it.next().value
+var promise = it.next().value // start generator
 console.log(promise)
 
 promise.then((result) => {
   console.log(result)
-  var response = it.next(result)
+  var response = it.next(result) // resolve result
   console.log(response)
 })
 

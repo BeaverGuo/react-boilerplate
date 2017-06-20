@@ -255,6 +255,96 @@ function* fetchPostsWithTimeout() {
     put({type: 'TIMEOUT_ERROR'})
 }
 
+/*suppose we have 2 UI buttons:
+
+The first starts a task in the background that runs in an endless loop while (true) (e.g. syncing some data with the server each x seconds).
+
+Once the background task is started, we enable a second button which will cancel the task
+*/
+import { race, take, put } from 'redux-saga/effects'
+
+function* backgroundTask() {
+  while (true) { ... }
+}
+
+function* watchStartBackgroundTask() {
+  while (true) {
+    yield take('START_BACKGROUND_TASK')
+    yield race({
+      task: call(backgroundTask),
+      cancel: take('CANCEL_TASK')
+    })
+  }
+}
+//In the case a CANCEL_TASK action is dispatched, the race Effect will automatically cancel backgroundTask by throwing a cancellation error inside it.
+
+
+// sequence saga using yield *
+function* playLevelOne() { ... }
+
+function* playLevelTwo() { ... }
+
+function* playLevelThree() { ... }
+
+function* game() {
+  const score1 = yield* playLevelOne()
+  yield put(showScore(score1))
+
+  const score2 = yield* playLevelTwo()
+  yield put(showScore(score2))
+
+  const score3 = yield* playLevelThree()
+  yield put(showScore(score3))
+}
+
+//Note that using yield* will cause the JavaScript runtime to spread the whole sequence. The resulting iterator (from game()) will yield all values from the nested iterators. A more powerful alternative is to use the more generic middleware composition mechanism.
+
+
+//composing sagas
+/*While using yield* provides an idiomatic way of composing Sagas, this approach has some limitations:
+
+You'll likely want to test nested generators separately. This leads to some duplication in the test code as well as the overhead of the duplicated execution. We don't want to execute a nested generator but only make sure the call to it was issued with the right argument.
+
+More importantly, yield* allows only for sequential composition of tasks, so you can only yield* to one generator at a time.
+*/
+function* fetchPosts() {
+  yield put(actions.requestPosts())
+  const products = yield call(fetchApi, '/products')
+  yield put(actions.receivePosts(products))
+}
+
+function* watchFetch() {
+  while (yield take(FETCH_POSTS)) {
+    yield call(fetchPosts) // waits for the fetchPosts task to terminate
+  }
+}
+
+//Yielding to an array of nested generators will start all the sub-generators in parallel, wait for them to finish, then resume with all the results
+
+function* mainSaga(getState) {
+  const results = yield all([call(task1), call(task2), ...])
+  yield put(showResults(results))
+}
+
+//For example, you may want the user to finish some game in a limited amount of time:
+
+function* game(getState) {
+  let finished
+  while (!finished) {
+    // has to finish in 60 seconds
+    const {score, timeout} = yield race({
+      score: call(play, getState),
+      timeout: call(delay, 60000)
+    })
+
+    if (!timeout) {
+      finished = true
+      yield put(showScore(score))
+    }
+  }
+}
+
+
 //generator
 function* sum() {
   var x = 0
@@ -327,6 +417,8 @@ promise.then((result) => {
   var response = it.next(result) // resolve result
   console.log(response)
 })
+
+
 
 
 

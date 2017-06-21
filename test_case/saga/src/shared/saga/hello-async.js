@@ -38,5 +38,5 @@ export function* sayHelloAsync(action: { payload: number}): Generator<IOEffect, 
 
 // Our watcher Saga: spawn a new sayHelloAsync task on each INCREMENT_ASYNC
 export default function* watchSayHelloAsync(): Generator<IOEffect, *, *> {
-  yield* takeEvery(SAY_HELLO_ASYNC_REQUEST, sayHelloAsync)
+  yield takeEvery(SAY_HELLO_ASYNC_REQUEST, sayHelloAsync)
 }

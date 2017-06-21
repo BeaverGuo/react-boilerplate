@@ -8,7 +8,7 @@ import watchSayHelloAsync from './hello-async'
 // yields an array with results of calling our two sagas
 export default function* rootSaga(): Generator<IOEffect, *, *> {
   // these resulting Generators will be started in parallel.
-  yield* all([
+  yield all([
     watchSayHelloAsync(),
   ])
 }

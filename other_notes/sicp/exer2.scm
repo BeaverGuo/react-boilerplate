@@ -215,6 +215,102 @@
  ;; Thus we now have 4 representations for rectangles, all of which can use the  
  ;; same area and perimeter functions. 
 
+;; Here's another one: This allows arbitrary rotated rectangles, and the representation is the easiest in my opinion. The rectangle is represented by the "base" - i.e. the segment with 2 bottom points, and the left side. To keep it simple, the input is the base, and the "height" from the base. Here height is in the direction perpendicular to the base, and not along Y-axis.  
+  
+ ;; This doesn't require error-checking as these parameters can't go wrong (base and height) and a rectangle is uniquely defined by them. 
+  
+ (define (perimeter-r r) 
+   (let ((width (width-r r)) 
+         (height (height-r r))) 
+     (* 2 (+ height width)))) 
+  
+ (define (area-r r) 
+   (let ((width (width-r r)) 
+         (height (height-r r))) 
+     (* width height))) 
+  
+ (define (width-r r) 
+   (length-seg (base-seg r))) 
+  
+ (define (height-r r) 
+   (length-seg (left-side r))) 
+  
+ (define (length-seg seg) 
+   (let ((p1 (start-segment seg)) 
+         (p2 (end-segment seg))) 
+     (let ((x1 (x-point p1)) 
+           (y1 (y-point p1)) 
+           (x2 (x-point p2)) 
+           (y2 (y-point p2))) 
+       (sqrt (+ (square (- x1 x2)) 
+                (square (- y1 y2))))))) 
+  
+ (define (square x) 
+   (* x x)) 
+  
+ (define (base-seg r) 
+   (car r)) 
+  
+ (define (left-side r) 
+   (cdr r)) 
+  
+ (define (make-rectangle base-seg height) 
+   (let ((p1 (start-segment base-seg)) 
+         (p2 (end-segment base-seg))) 
+     (let ((x1 (x-point p1)) 
+           (y1 (y-point p1)) 
+           (x2 (x-point p2)) 
+           (y2 (y-point p2))) 
+       (let ((theta (atan (/ (- y2 y1) 
+                             (- x2 x1))))) 
+         (let ((new-x (- x1 (* height (sin theta)))) 
+               (new-y (+ y1 (* height (cos theta))))) 
+           (cons base-seg 
+                 (make-segment 
+                  p1 
+                  (make-point new-x new-y))))))))
+
+;; Representation 1: (cons (bottom-left point) (top-right point)) 
+ (define (make-rect p1 p2) 
+   (let ((x1 (x-point p1)) 
+         (x2 (x-point p2)) 
+         (y1 (y-point p1)) 
+         (y2 (y-point p2))) 
+     (cond ((and (< x1 x2) (< y1 y2)) (cons p1 p2)) 
+           ((and (> x1 x2) (> y1 y2)) (cons p2 p1)) 
+           ((and (< x1 x2) (> y1 y2)) (cons (make-point x1 y2) (make-point x2 y1))) 
+           (else (cons (make-point x2 y1) (make-point x1 y2)))))) 
+  
+ (define (bottom-left r) 
+   (car r)) 
+  
+ (define (top-right r) 
+   (cdr r)) 
+  
+ ;; Representation 2: (cons (bottom-left point) (cons width height)) 
+ (define (make-rect p1 p2) 
+   (let ((x1 (x-point p1)) 
+         (x2 (x-point p2)) 
+         (y1 (y-point p1)) 
+         (y2 (y-point p2))) 
+     (let ((width (abs (- x1 x2))) 
+           (height (abs (- y1 y2)))) 
+       (cond ((and (< x1 x2) (< y1 y2)) (cons p1 (cons width height))) 
+             ((and (> x1 x2) (> y1 y2)) (cons p2 (cons width height))) 
+             ((and (< x1 x2) (> y1 y2)) (cons (make-point x1 y2) (cons width height))) 
+             (else (cons (make-point x2 y1) (cons width height))))))) 
+  
+ (define (bottom-left r) 
+   (car r)) 
+  
+ (define (top-right r) 
+   (let ((x (x-point (car r))) 
+         (y (y-point (car r))) 
+         (w (car (cdr r))) 
+         (h (cdr (cdr r)))) 
+     (make-point (+ x w) (+ y h))))
+
+ 
 ;; return a procedure
  (define (cons x y)
   (define (dispatch m)
@@ -282,3 +378,4 @@
 
 (define (car z)
   )
+

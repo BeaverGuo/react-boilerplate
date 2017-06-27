@@ -1048,4 +1048,6 @@ First invocation of f will attempt to apply its argument (which is f) to 2. This
      ; improve function is nothing but the 
      ; function f whose fixed point is to be found! 
      f 
-     close-enough?) first-guess)) 
+     close-enough?) first-guess))
+
+

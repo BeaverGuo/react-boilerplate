@@ -215,5 +215,29 @@ function compose(...funcs) {
     }
 }
 
+//single responsibility principle
+
+//a component should have only one reason to change
+//isolate uncertainty
+
+//compound components是自身的状态像select/Tab是不需要放到redux state里面的
+
+//we iterate over the children and use cloneElement to change their props
+
+
+render() {
+    const children = React.Children.map(this.props.children,(child)=>{
+        if(child.type === TabPannels) {
+            //before render dom?
+            return React.cloneElement(child, {
+                activeIndex: this.state.activeIndex
+            })
+        } else {
+            return child
+        }
+    })
+}
+
+
 
 

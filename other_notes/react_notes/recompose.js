@@ -215,5 +215,81 @@ function compose(...funcs) {
     }
 }
 
+//recompose is a react utility belt for function components and higher-order components
 
+//Wrapped Functions
+//withState withHandlers shouldUpdate withPropsOnChange lifecycle and many more...
 
+//withState
+
+const withCounterState = withState(`couter`, `setCounter`, 0)
+
+const Counter = ({
+    counter,
+    setCounter
+}) => (
+    <div>
+        Count: {counter}
+        <button onClick={() => setCounter(n => n + 1)}>Increment</button>
+        <button onClick={() => setCounter(n => n - 1)}>Decrement</button>
+    </div>
+)
+
+export default compose(
+    withCounterState,
+)(Counter)
+
+//withHandlers
+const withCounterHandler = withHandlers({
+    handleCounterUp: ({
+        counter,
+        setCounter
+    }) => () => {
+        setCounter(counter + 1)
+    },
+    handleCounterDown: ({
+        counter,
+        setCounter
+    }) => () => {
+        setCounter(counter - 1)
+    },
+})
+
+//withState & withHandlers
+
+const Counter = ({
+    counter,
+    handleCounterUp,
+    handleCounterDown
+}) => (
+    <div>
+        Count: {counter}
+        <button onClick={handleCounterUp}>Increment</button>
+        <button onClick={handleCounterDown}>Decrement</button>
+    </div>
+)
+
+export default compose(
+    withCounterState,
+    withCounterHandler,
+)(Counter)
+
+//shouldUpdate
+
+const withCommitsAmountChanged = shouldUpdate(
+    (props, nextProps) => {
+        if(
+            (props.commitsMax !== nextProps.commitsMax) ||
+            (props.someotherProp !== nextProps.someotherProp)        
+        ) {
+            return true
+        }
+
+        return false
+    }
+)
+
+//Decouple functional -and presentational layers
+// fast dev. improves refactoring. more readability
+
+//but expensive to change if abstraction is wrong

@@ -214,6 +214,7 @@
   
  ;; Thus we now have 4 representations for rectangles, all of which can use the  
  ;; same area and perimeter functions. 
+
 ;; Here's another one: This allows arbitrary rotated rectangles, and the representation is the easiest in my opinion. The rectangle is represented by the "base" - i.e. the segment with 2 bottom points, and the left side. To keep it simple, the input is the base, and the "height" from the base. Here height is in the direction perpendicular to the base, and not along Y-axis.  
   
  ;; This doesn't require error-checking as these parameters can't go wrong (base and height) and a rectangle is uniquely defined by them. 
@@ -308,4 +309,73 @@
          (w (car (cdr r))) 
          (h (cdr (cdr r)))) 
      (make-point (+ x w) (+ y h))))
+
+ 
+;; return a procedure
+ (define (cons x y)
+  (define (dispatch m)
+    (cond ((= m 0) x)
+      ((= m 1) y)
+      (else (error 'Argument not 0 or 1 -- CONS' m))))
+  dispatch)
+
+ (define (car z) (z 0))
+ (define (cdr z) (z 1))
+;; in js
+
+
+;;2.4 
+
+(define (cons x y)
+  (lambda (m) (m x y)))
+
+;; z is a function accept argument function m and apply arguments x y and return x
+(define (car z)
+  (z (lambda (p q) p)))
+
+(define (cdr z)
+  (z (lambda (p q) q)))
+
+
+ ;; given: 
+  
+ (define (cons a b) 
+   (lambda (m) (m a b))) 
+  
+ ;; Commentary: cons returns a function that takes a function of 2 
+ ;; args, a and b.  The function will receive the values of a and b 
+ ;; passed to cons when cons was called initially. 
+  
+ ;; z is a function that takes a 2-arg function.  That inner function 
+ ;; will be passed p and q in that order, so just return the first arg, p. 
+ (define (car z) 
+   (z (lambda (p q) p))) 
+  
+  
+ ;; ... so this is obvious. 
+ (define (cdr z) 
+   (z (lambda (p q) q))) 
+
+
+;;Using applicative-order evaluation, verify that (car (cons x y)) yields x for any objects x and y:
+(car (cons x y)) 
+ (car (lambda (m) (m x y))) 
+ ((lambda (m) (m x y)) (lambda (p q) p)) 
+ ((lambda (p q) p) x y) 
+ x
+
+;;substitution rule
+ (car (cons a b)) 
+ ;-> ((cons a b) (lambda (p q) p)) 
+ ;-> ((lambda (m) (m a b)) (lambda (p q) p)) 
+ ;-> ((lambda (p q) p) a b) 
+ ;-> a 
+
+
+;; 2.5
+(define (exp_2_3 a b)
+  (* (exp 2 a) (exp 3 b)))
+
+(define (car z)
+  )
 

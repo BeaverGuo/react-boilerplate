@@ -5,6 +5,8 @@ import Helmet from 'react-helmet'
 
 import { APP_NAME } from '../../config'
 
+const title = 'Home Page'
+
 const HomePage = () =>
   (<div>
     <Helmet
@@ -13,7 +15,7 @@ const HomePage = () =>
         { property: 'og:title', content: APP_NAME },
       ]}
     />
-    <h1>{APP_NAME}</h1>
+    <h1>{title}</h1>
   </div>)
 
 export default HomePage

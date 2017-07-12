@@ -59,6 +59,7 @@
     "react-router-dom": "^4.1.1",
     "redux": "^3.6.0",
     "redux-actions": "^2.0.3",
-    "redux-saga": "^0.15.3"
+    "redux-saga": "^0.15.3",
+    "rx": "^4.1.0"
   }
 }

@@ -310,7 +310,7 @@
          (h (cdr (cdr r)))) 
      (make-point (+ x w) (+ y h))))
 
- 
+
 ;; return a procedure
  (define (cons x y)
   (define (dispatch m)
@@ -373,9 +373,204 @@
 
 
 ;; 2.5
+;; my answer. I mean x is a function to accept a b and apply 2^a and 3^b and return the result of
+;; 2^a * 3^b
 (define (exp_2_3 a b)
-  (* (exp 2 a) (exp 3 b)))
+  (lambda(x) (x a b)))
 
 (define (car z)
+  z((lambda(a b) a))
   )
 
+(define (cdr z)
+  z((lambda(a b) b))
+  )
+
+;; self answer
+
+(define (exp base n)
+  (define (iter x result)
+    (if (> x 0)
+      (iter (- x 1) (* result base)) ;;iterative reduce an assignment `result = result * base`
+      result))
+  (iter n 1))
+
+(define (count-0-remainder-divisions n divisor) ;; can not figure out this solution
+  (define (iter try-exp)
+    (if (= (remainder n (exp divisor try-exp)) 0)
+      (iter (+ try-exp 1))
+      (- try-exp 1)))
+  (iter 1))
+
+;; ex 2.5, pairs of integers. 
+  
+ ;; Pair a, b can be stored as a single integer 2^a * 3^b, provided a 
+ ;; and b are both non-negative integers.  The first part will be even, 
+ ;; the last odd.  Getting rid of the even part will leave the odd, and 
+ ;; vice versa. 
+  
+ ;; Helpers. 
+  
+ (define (exp base n) 
+   (define (iter x result) 
+     ;; invariant: base^x * result is constant. 
+     (if (= 0 x) 
+         result 
+         (iter (- x 1) (* base result)))) 
+   (iter n 1)) 
+  
+  
+ (define (count-0-remainder-divisions n divisor) 
+   (define (iter try-exp) 
+     (if (= 0 (remainder n (exp divisor try-exp))) 
+         (iter (+ try-exp 1))  ;; Try another division. 
+         (- try-exp 1))) 
+  
+   ;; We don't need to try 0 divisions, as that will obviously pass. 
+   (iter 1)) 
+  
+  
+ ;; cons, car, cdr 
+ (define (my-cons a b) (* (exp 2 a) (exp 3 b))) 
+ (define (my-car z) (count-0-remainder-divisions z 2)) 
+ (define (my-cdr z) (count-0-remainder-divisions z 3)) 
+
+  ;; Another way to define count-0-remainder-divisions 
+  
+ (define (divides? a b) 
+   (= 0 (remainder b a))) 
+  
+ (define (count-0-remainder-divisions n divisor) 
+   (define (iter x divisions) 
+     (if (divides? divisor x) 
+         (iter (/ x divisor) (+ divisions 1)) 
+         divisions)) 
+   (iter n 0)) 
+
+
+;; Constructor  chekkal's answer 
+ (define (cons a b) (* (expt 2 a) (expt 3 b))) 
+ ;; Enables us to calculate the log of n in base b 
+ (define (logb b n) (floor (/ (log n) (log b)))) 
+ ;; Selectors 
+ (define (car x) (logb 2 (/ x (gcd x (expt 3 (logb 3 x)))))) 
+ (define (cdr x) (logb 3 (/ x (gcd x (expt 2(logb 2 x)))))) 
+
+;;This is probably similar to chekkal's answer at the end of the day. One downside is it returns floats, but this could probably be remedied via a round procedure (not yet introduced in course).
+ (define (cons a b) 
+   (* (expt 2 a) (expt 3 b))) 
+  
+ ; once we factor out the 3s, then: 
+ ; 2^a = z 
+ ; log(2^a) = log(z) 
+ ; a*log(2) = log(z) 
+ ; a = log(z) / log (2) 
+  
+ (define (car z) 
+   (define (divisble-by-3? a) 
+     (= (remainder a 3) 0)) 
+   (if (divisble-by-3? z) 
+     (car (/ z 3)) 
+     (/ (log z) (log 2)))) 
+  
+ ; once we factor out the 2s, then: 
+ ; 3^b = z 
+ ; log(3^b) = log(z) 
+ ; b * log(3) = log(z) 
+ ; b = log(z) / log(3) 
+  
+ (define (cdr z) 
+   (define (even? a) 
+     (= (remainder a 2) 0)) 
+   (if (even? z) 
+     (cdr (/ z 2)) 
+     (/ (log z) (log 3)))) 
+
+ ;;there exist some mistakes in chekkal's code, which leads to wrong results in some condition. For example, (cdr (cons 11 17) will get 16 as output. Below are my codes,
+
+ (define (cons a b) (* (expt 2 a) (expt 3 b) ) ) 
+ (define (logb b n) 
+  (ceiling (/ (log n) (log b) ) 
+  ) 
+  ) 
+ (define (car n) 
+  (logb 2  
+                   (gcd 
+                    n 
+                    (expt 2 (logb 2 n) ) 
+                   ) 
+  ) 
+  ) 
+ (define (cdr n) 
+  (logb 3  
+                   (gcd 
+                    n 
+                    (expt 3 (logb 3 n) ) 
+                   ) 
+  ) 
+  ) 
+                                 ;test 
+                                 (define x (cons 11 17) ) 
+                                 (car x) 
+                                 (cdr x) 
+
+  
+ ;;;Helpers 
+ ;;Computes b^n ref: SICP -section 1.2.4 
+ ;; b^n  = 1 if n = 0 
+ ;;      = (b^(n/2))^2 if n even 
+ ;;      = b.b^(n-1)  o.w. 
+ (define (expt b n) 
+   (define (even? n) (= (remainder n 2) 0)) 
+   (define (square x) (* x x)) 
+   (cond ((= n 0) 1) 
+        ((even? n) (square (expt b (/ n 2)))) 
+        (else (* b (expt b (- n 1)))))) 
+  
+ ;;return p where n = (k^p).q such that k does not divide q 
+ (define (pow k n) 
+     (if (not (= 0 (remainder n k)))  0  (+ 1 (pow k (quotient n k))))) 
+  
+ ;;test pow 
+ (pow 2 (* (expt 2 3) (expt 7 11))) 
+ (pow 7 (* (expt 2 3) (expt 7 11))) 
+ (pow 5 (* (expt 2 3) (expt 7 11))) 
+  
+ ;;;represent pairs of non-negative integers as 2^a.3^b 
+ (define (cons a b)  (* (expt 2 a) (expt 3 b))) 
+ (define (car p) (pow 2 p)) 
+ (define (cdr p) (pow 3 p))
+
+
+  (define (cons x y) 
+   (* (expt 2 x) (expt 3 y))) 
+  
+ (define (car z)            
+   (if (= (gcd z 2) 1)      
+     0                      
+     (+ 1 (car (/ z 2))))) 
+  
+ (define (cdr z)           
+   (if (= (gcd z 3) 1)     
+     0                     
+     (+ 1 (cdr (/ z 3))))) 
+
+
+;; The last solution can be abstracted further:
+(define (largest-power-of a z) 
+   (if (= (remainder z a) 0) 
+     (+ 1 (largest-power-of a (/ z a))) 
+     0)) 
+  
+ (define (car z) 
+   (largest-power-of 2 z)) 
+  
+ (define (cdr z) 
+   (largest-power-of 3 z)) 
+
+
+;; 2.6
+
+(define zero (lambda(f) (lambda(x) x)))
+(define (add-1 n)
+  (lambda(f) (lambda (x) (f ((n f) x)))))

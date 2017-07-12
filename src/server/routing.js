@@ -14,6 +14,7 @@ import {
   homePage,
   helloPage,
   helloAsyncPage,
+  followOthersPage,
   helloEndpoint,
 } from './controller'
 
@@ -21,6 +22,7 @@ import {
   HOME_PAGE_ROUTE,
   HELLO_PAGE_ROUTE,
   HELLO_ASYNC_PAGE_ROUTE,
+  FOLLOW_OTHERS_PAGE_ROUTE,
   helloEndpointRoute,
 } from '../shared/routes'
 
@@ -37,6 +39,10 @@ export default (app: Object) => {
 
   app.get(HELLO_ASYNC_PAGE_ROUTE, (req, res) => {
     res.send(renderApp(req.url, helloAsyncPage()))
+  })
+
+  app.get(FOLLOW_OTHERS_PAGE_ROUTE, (req, res) => {
+    res.send(renderApp(req.url, followOthersPage()))
   })
 
   app.get(helloEndpointRoute(), (req, res) => {

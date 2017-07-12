@@ -17,8 +17,6 @@
     "prod:stop": "pm2 delete server",
     "lint": "eslint src webpack.config.babel.js --ext .js,.jsx",
     "test": "yarn lint && flow && jest --coverage"
-    //"precommit": "yarn test",
-    //"prepush": "yarn test && yarn prod:build"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -61,6 +59,7 @@
     "react-router-dom": "^4.1.1",
     "redux": "^3.6.0",
     "redux-actions": "^2.0.3",
-    "redux-saga": "^0.15.3"
+    "redux-saga": "^0.15.3",
+    "rx": "^4.1.0"
   }
 }

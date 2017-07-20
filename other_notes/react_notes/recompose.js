@@ -215,9 +215,7 @@ function compose(...funcs) {
     }
 }
 
-<<<<<<< HEAD
 //recompose is a react utility belt for function components and higher-order components
-=======
 //single responsibility principle
 
 //a component should have only one reason to change

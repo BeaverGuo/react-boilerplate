@@ -216,6 +216,7 @@ function compose(...funcs) {
 }
 
 //recompose is a react utility belt for function components and higher-order components
+
 //single responsibility principle
 
 //a component should have only one reason to change
@@ -240,7 +241,6 @@ render() {
 }
 
 
->>>>>>> 258d76378665ac907298762147822636e825c8e8
 
 //Wrapped Functions
 //withState withHandlers shouldUpdate withPropsOnChange lifecycle and many more...
@@ -428,7 +428,6 @@ const enhance = compose(
 const EnhancedComponent = enhance(BaseComponent)
 
 Technically, this also means you can use them as decorators (if that's your thing):
-
 @withState(/*...args*/)
 @mapProps(/*...args*/)
 @pure

@@ -861,6 +861,10 @@ babylon@^6.11.0, babylon@^6.13.0, babylon@^6.15.0, babylon@^6.17.0:
   version "6.17.2"
   resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.17.2.tgz#201d25ef5f892c41bae49488b08db0dd476e9f5c"
 
+baconjs@^0.7.94:
+  version "0.7.94"
+  resolved "http://r.cnpmjs.org/baconjs/download/baconjs-0.7.94.tgz#bdba8c4ab92aac5c8096d22f273eb0674b1afdb2"
+
 balanced-match@^0.4.1:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-0.4.2.tgz#cb3f3e3c732dc0f01ee70b403f302e61d7709838"

@@ -9,6 +9,7 @@ const title = 'Home Page'
 
 const HomePage = () =>
   (<div>
+    <button onClick={handleClick}>Click me!</button>
     <Helmet
       meta={[
         { name: 'description', content: 'Hello App is an app to say hello' },
